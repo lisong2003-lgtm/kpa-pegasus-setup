@@ -1,0 +1,80 @@
+PLATFORM INVENTORY (36 expected)
+PLAT         GAMES  CORE                                   per-game-launch  collection
+A2600          212  stella2023_libretro_android.so             0  A2600
+ANDROID          7  (non-RA / custom)                          7  ANDROID
+ATOMISWAVE      11  flycast_libretro_android.so                0  ATOMISWAVE
+CPS1            30  fbalpha2012_cps1_libretro_android.so       0  CPS1
+CPS2            36  fbalpha2012_cps2_libretro_android.so       0  CPS2
+CPS3             5  fbalpha2012_cps3_libretro_android.so       0  CPS3
+DOS             15  dosbox_pure_libretro_android.so            0  DOS
+DREAMCAST        5  flycast_libretro_android.so                0  DREAMCAST
+EASYRPG         13  easyrpg_libretro_android.so                0  EASYRPG
+FBNEO          234  fbneo_libretro_android.so                  0  FBNEO
+FC              68  nestopia_libretro_android.so               0  FC
+GB             675  mgba_libretro_android.so                   0  GB
+GBA            426  mgba_libretro_android.so                   0  GBA
+GBC            483  mgba_libretro_android.so                   0  GBC
+GG             192  gearsystem_libretro_android.so             0  GG
+MAME           277  mame2003_plus_libretro_android.so          0  MAME
+MD              13  picodrive_libretro_android.so              0  MD
+MDCD             2  genesis_plus_gx_libretro_android.so        0  MDCD
+MSX             30  bluemsx_libretro_android.so                0  MSX
+N64             15  mupen64plus_next_gles3_libretro_android.so     0  N64
+NAOMI           15  flycast_libretro_android.so                0  NAOMI
+NDS             93  melonds_libretro_android.so                0  NDS
+NEOGEO         168  fbalpha2012_neogeo_libretro_android.so     0  NEOGEO
+NGP             81  mednafen_ngp_libretro_android.so           0  NGP
+PCE            176  mednafen_pce_fast_libretro_android.so      0  PCE
+PCECD            2  mednafen_pce_libretro_android.so           0  PCECD
+PICO            80  retro8_libretro_android.so                 0  PICO
+PS               4  swanstation_libretro_android.so            0  PS
+PSP              4  (non-RA / custom)                          4  PSP
+SATURN           4  yabasanshiro_libretro_android.so           0  SATURN
+SEGA32X          8  picodrive_libretro_android.so              0  SEGA32X
+SFC             27  snes9x2005_plus_libretro_android.so        0  SFC
+SMS             77  genesis_plus_gx_libretro_android.so        0  SMS
+VARCADE         74  mame2003_plus_libretro_android.so          0  VARCADE
+VB              28  mednafen_vb_libretro_android.so            0  VB
+WS             182  mednafen_wswan_libretro_android.so         0  WS
+_backup_20261112_2347   278  mame2003_plus_libretro_android.so          0  MAME
+
+TOTAL platforms=37 games=4050
+
+SAMPLING PLAN (seed 20261113, 3 games/platform, avoid previously-tested names)
+  A2600        -> 困惑迷宫 | Q伯特 | 午夜狂飙
+  ANDROID      -> 泰拉瑞亚 | 海之号角 | 忍者神龟：施莱德的复仇
+  ATOMISWAVE   -> 快打刑事EX | 上海2005 | 玩具格斗
+  CPS1         -> dynwarjr | dino | captcomm
+  CPS2         -> sfa2 | batcir | ddtod
+  CPS3         -> sfiii3 | redearth | jojo
+  DOS          -> 炎龙骑士团 | 轩辕剑外传-枫之舞 | 仙剑奇侠传
+  DREAMCAST    -> 沉默狙击手 | 立体壁球 | 快打刑事
+  EASYRPG      -> 野比大雄的生化危机 | Mogeko城堡 | 梦幻重装机兵
+  FBNEO        -> zeroteam | thunderx | kov2p204
+  FC           -> 热血足球联盟 | 洛克人 | 大金刚合集
+  GB           -> 合格小子系列-顽固头脑变灵活-汉字达人 | 优胜之马 | 星之卡比2
+  GBA          -> 火影忍者 最强忍者大集合2 | 雷曼 疯兔 | 魔法假期
+  GBC          -> 鲁普大冒险菲克斯与福克西 | 怪兽拆楼2代–宇宙之旅 | 夜光虫
+  GG           -> 水晶战士 | 扑克 保罗的接龙纸牌 | 紫禁城
+  MAME         -> bayroute | xmen | splatter
+  MD           -> 战斧3 | 街头霸王II：冠军特别版 | 怒之铁拳2
+  MDCD         -> 蜘蛛侠对抗金并 | 拦截者
+  MSX          -> 南海道杀人事件 | 山村美纱侦探-京都龙之寺杀人事件 | 迷宫
+  N64          -> 恶魔城默示录 | 冲浪大赛 | 超级杰克龙64
+  NAOMI        -> wldkicks | ggram2 | zombrvn
+  NDS          -> 大航海时代4：罗塔诺瓦 | 黄金太阳：漆黑的黎明 | 合金弹头7
+  NEOGEO       -> ctomaday | rotd | neocup98
+  NGP          -> 吃豆小精灵 | 绘画拼图 | 巴克拉牌
+  PCE          -> 武装刑事-网络交错 | 暗夜生物 | 龙蛋
+  PCECD        -> 恶魔城 | 超兄贵
+  PICO         -> 甲虫 | 扫雷 | 哈利攀登之旅
+  PS           -> 圣剑传说：玛娜传奇 | 恶魔城：月下夜想曲 | 胜利十一人2002
+  PSP          -> 实况足球 2009 | 山脊赛车 | 战神-奥林匹斯之链
+  SATURN       -> 守护英雄 | 钟表骑士 | 钟表骑士 2
+  SEGA32X      -> FIFA国际足球96 | 打点棒球95 | NBA灌蓝秀
+  SFC          -> 星之卡比：超级豪华版 | 超级马里奥世界 | 超级马里奥兄弟：失落关卡
+  SMS          -> 女警刑事2 | 迪克探长 | 彩虹岛
+  VARCADE      -> upndown | pacplus | bwcasino
+  VB           -> 益智实验VB | 汉堡在去瑞士的路上 | 尼斯特时髦保龄球
+  WS           -> DJ快打 | 谜王口袋版 | 子育问答 我的天使
+  _backup_20261112_2347 -> rtype | pacmania | uccopsj

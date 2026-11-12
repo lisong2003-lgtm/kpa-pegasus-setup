@@ -1,0 +1,47 @@
+=== REAL VERTICAL CFG (backups excluded) ===
+  FB Alpha 2012 CPS-1             3
+  FB Alpha 2012 CPS-2             2
+  FB Alpha 2012 NeoGeo            2
+  FinalBurn Neo                  69
+  MAME 2003-Plus                140
+  TOTAL 216
+
+=== SAMPLING PLAN ===
+  A2600      normal=3 vert=0  困惑迷宫 | Q伯特 | 午夜狂飙
+  ANDROID    normal=3 vert=0  泰拉瑞亚 | 海之号角 | 忍者神龟：施莱德的复仇
+  ATOMISWAVE normal=3 vert=0  快打刑事EX | 上海2005 | 玩具格斗
+  CPS1       normal=3 vert=0  dynwarjr | dino | captcomm
+  CPS2       normal=3 vert=1  sfa3 | batcir | ddtod  [V] dimahoo
+  CPS3       normal=3 vert=0  jojo | redearth | jojoba
+  DOS        normal=3 vert=0  仙剑奇侠传 | 魔影哈雷 | 鹿鼎记
+  DREAMCAST  normal=3 vert=0  沉默狙击手 | 立体壁球 | 快打刑事
+  EASYRPG    normal=3 vert=0  野比大雄的生化危机 | Mogeko城堡 | 梦幻重装机兵
+  FBNEO      normal=3 vert=3  p47 | lomakai | kov2p202  [V] grdnstrm | gunbird | finalizr
+  FC         normal=3 vert=0  绿色兵团 | 马戏团 | 西游记世界2 天上界的魔神
+  GB         normal=3 vert=0  幽游白书 | 柏青嫂必胜GB | 恺撒皇宫
+  GBA        normal=3 vert=0  爆转陀螺 | 侦探学园Q 挑战究极诡计 | 烈火之炎
+  GBC        normal=3 vert=0  新世代机器人战记 | 真女神转生外传–最后的圣经1代 | 费利克斯猫–万圣节
+  GG         normal=3 vert=0  泡泡龙 | 旋风狗泰兹-逃出火星 | 终结者1
+  MAME       normal=3 vert=3  parodius | bloodstm | hook  [V] gcpinbal | amazon | aerofgt
+  MD         normal=3 vert=0  街头霸王II：冠军特别版 | 刺猬索尼克3 | 魂斗罗：铁血兵团
+  MDCD       normal=2 vert=0  拦截者 | 蜘蛛侠对抗金并
+  MSX        normal=3 vert=0  柏青哥传说 | 忍者君-阿修罗之章 | 合金装备一代
+  N64        normal=3 vert=0  泡泡龙 | 塞尔达传说：梅祖拉的假面 | 星之卡比64：水晶碎片
+  NAOMI      normal=3 vert=0  qmegamis | vs2_2k | ggx
+  NDS        normal=3 vert=0  宝可梦：黑2 | 牧场物语：幸福之岛 | 星之卡比：集合!卡比
+  NEOGEO     normal=3 vert=0  eightman | tophuntr | shocktr2
+  NGP        normal=3 vert=0  合金弹头-二号任务 | 高尔夫大巡回赛 | 恋恋麻将
+  PCE        normal=3 vert=0  疯狂赛车 | 源平讨魔传 | 雷电
+  PCECD      normal=2 vert=0  恶魔城 | 超兄贵
+  PICO       normal=3 vert=0  兰博 - 越狱 | 黑暗LBA | 跳跃吃星
+  PS         normal=3 vert=0  圣剑传说：玛娜传奇 | 胜利十一人2002 | 射雕英雄传
+  PSP        normal=3 vert=0  实况足球 2009 | 山脊赛车 | 侠盗猎车 - 罪恶都市传奇
+  SATURN     normal=3 vert=0  钟表骑士 | 空牙 2001 | 守护英雄
+  SEGA32X    normal=3 vert=0  WWF超级摔角 WWF Wrestlemania Arcade | FIFA国际足球96 | 冲破火网
+  SFC        normal=3 vert=0  超级炸弹人4 | 忍者神龟IV：时空之战 | 超级魔界村
+  SMS        normal=3 vert=0  真宝珠小子 | 特别刑事组 | 蝙蝠侠
+  VARCADE    normal=0 vert=3    [V] sandscrp | bwcasino | pacplus
+  VB         normal=3 vert=0  垂直战机 | 未来水世界 | 太空壁球
+  WS         normal=3 vert=0  名侦探柯南 魔术师的挑战书 | 劲上果岭 | 线脑 千禧版
+
+TOTAL platforms=36  samples=113  vertical=10

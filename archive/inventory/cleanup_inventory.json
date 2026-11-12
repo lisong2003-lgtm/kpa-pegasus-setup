@@ -1,0 +1,303 @@
+{
+ "dev_delete": [
+  {
+   "path": "/storage/6AF3-384F/Roms/_backup_20261112_2347",
+   "type": "目录",
+   "bytes": 655360,
+   "why": "galaga 移除时的旧 MAME metadata + ROM + 封面备份；还导致天马多收录 1 个幽灵游戏（game_dirs 已修）。Mac 侧 kpa-backup/2026-11-12-2245/galaga_removal/ 有完整备份"
+  },
+  {
+   "path": "/storage/6AF3-384F/Roms/EASYRPG/_backup_covers_20261113",
+   "type": "目录",
+   "bytes": 3932160,
+   "why": "里面复制的是【新封面】，与 EASYRPG/Imgs/ 完全重复；真正的旧封面在 Mac easyrpg_backup/Imgs/"
+  },
+  {
+   "path": "/storage/emulated/0/RetroArch/config/_backup_20261112_2335",
+   "type": "目录",
+   "bytes": 667648,
+   "why": "竖版按键排查的中间 cfg 备份，最终配置已确认推广；Mac 侧 2026-11-12-2245/ 有完整备份"
+  },
+  {
+   "path": "/storage/emulated/0/RetroArch/config/_backup_20261112_2245",
+   "type": "目录",
+   "bytes": 12288,
+   "why": "同上，竖版 cfg 旧备份"
+  },
+  {
+   "path": "/storage/emulated/0/RetroArch/downloads/core_backups",
+   "type": "目录",
+   "bytes": 487424,
+   "why": "被中断的『更新已安装核心』留下的自动备份，实测无任何核心被覆盖，5 个核心冒烟全正常"
+  },
+  {
+   "path": "/sdcard/Download/bluemsx_libretro_android.so",
+   "type": "文件",
+   "bytes": 1740360,
+   "why": "用户下载的核心副本；已由 RA 装进 app 私有目录并验证可运行，public 路径 .so 被 SELinux 禁止执行"
+  },
+  {
+   "path": "/data/local/tmp/bluemsx_libretro_android.so",
+   "type": "文件",
+   "bytes": 1740360,
+   "why": "adb 调试时的 shell 临时副本，同样不可执行"
+  },
+  {
+   "path": "/storage/emulated/0/RetroArch/cores/bluemsx_libretro_android.so",
+   "type": "文件",
+   "bytes": 1740360,
+   "why": "public cores 目录下的核心副本，RA 从不读这里（libretro_directory 指向私有目录）"
+  },
+  {
+   "path": "/storage/emulated/0/RetroArch/bluemsx_libretro_android.so",
+   "type": "文件",
+   "bytes": 1740360,
+   "why": "RA 根目录下的第 4 份核心副本，无引用"
+  },
+  {
+   "path": "/storage/emulated/0/RetroArch/retroarch.cfg.bak_msx_url",
+   "type": "文件",
+   "bytes": 117199,
+   "why": "无效备份：内容指向已关闭的本地镜像 http://192.168.x.x:8765/，不是官方源；有效原版在 Mac msx_cfg_backup/retroarch.cfg.ORIGINAL_URL"
+  },
+  {
+   "path": "/storage/emulated/0/Android/data/com.retroarch.aarch64/files/retroarch.cfg.bak_msx_url",
+   "type": "文件",
+   "bytes": 117133,
+   "why": "同上，第二份无效 cfg 备份"
+  },
+  {
+   "path": "/sdcard/Download/dataCache.json.bak",
+   "type": "文件",
+   "bytes": 5249102,
+   "why": "11-12 的旧天马缓存备份，当前缓存已重建两次，Mac 侧也有"
+  },
+  {
+   "path": "/sdcard/pegasus-frontend/game_dirs.txt.bak20261113",
+   "type": "文件",
+   "bytes": 1096,
+   "why": "含幽灵备份目录行的旧配置备份；Mac 侧 edit/game_dirs/game_dirs.before.txt 有原版"
+  },
+  {
+   "path": "/storage/6AF3-384F/Roms/ANDROID/metadata.pegasus.txt.bak20261113",
+   "type": "文件",
+   "bytes": 1461,
+   "why": "改动前 metadata 备份，Mac 侧 edit/*.before.txt 有同版；当前版本已验证"
+  },
+  {
+   "path": "/storage/6AF3-384F/Roms/CPS1/metadata.pegasus.txt.bak20261113",
+   "type": "文件",
+   "bytes": 6227,
+   "why": "改动前 metadata 备份，Mac 侧 edit/*.before.txt 有同版；当前版本已验证"
+  },
+  {
+   "path": "/storage/6AF3-384F/Roms/NEOGEO/metadata.pegasus.txt.bak20261113",
+   "type": "文件",
+   "bytes": 27947,
+   "why": "改动前 metadata 备份，Mac 侧 edit/*.before.txt 有同版；当前版本已验证"
+  },
+  {
+   "path": "/storage/6AF3-384F/Roms/SFC/metadata.pegasus.txt.bak20261113",
+   "type": "文件",
+   "bytes": 5250,
+   "why": "改动前 metadata 备份，Mac 侧 edit/*.before.txt 有同版；当前版本已验证"
+  }
+ ],
+ "dev_keep": [
+  {
+   "path": "/sdcard/pegasus-frontend/themes/prosperoOS/GameDetails.qml.bak20261113",
+   "type": "文件",
+   "bytes": 9237,
+   "why": "增强版 QML 的原版，唯一回滚点，仅 9KB，保留"
+  },
+  {
+   "path": "/storage/emulated/0/RetroArch/system/firmware.bin.bak",
+   "type": "文件",
+   "bytes": 262144,
+   "why": "BIOS/固件备份，牵涉核心启动，保留"
+  },
+  {
+   "path": "/sdcard/pegasus-frontend/dataCache.json",
+   "type": "文件",
+   "bytes": 5789917,
+   "why": "天马运行时缓存，删了要重启重建，不算垃圾，保留"
+  },
+  {
+   "path": "/sdcard/pegasus-frontend/lastrun.log",
+   "type": "文件",
+   "bytes": 12191,
+   "why": "前端运行日志，自动覆盖，保留"
+  },
+  {
+   "path": "/storage/emulated/0/RetroArch/system/easyrpg-player/EasyRPG-Player.log",
+   "type": "文件",
+   "bytes": 350,
+   "why": "EasyRPG 运行日志，体积极小，保留"
+  }
+ ],
+ "local_delete": [
+  {
+   "path": "kpa-deploy/tm/dc*.json",
+   "type": "9 个文件",
+   "bytes": 47347744,
+   "why": "9 个 5MB 的天马缓存中间快照，纯调试产物",
+   "sample": [
+    "kpa-deploy/tm/dc.json",
+    "kpa-deploy/tm/dc2.json",
+    "kpa-deploy/tm/dc3.json",
+    "kpa-deploy/tm/dc4.json"
+   ]
+  },
+  {
+   "path": "kpa-deploy/backup-20261111-215838/pegasus-frontend/dataCache.json*",
+   "type": "2 个文件",
+   "bytes": 10587352,
+   "why": "11-11 的旧天马缓存及备份",
+   "sample": [
+    "kpa-deploy/backup-20261111-215838/pegasus-frontend/dataCache.json",
+    "kpa-deploy/backup-20261111-215838/pegasus-frontend/dataCache.json.bak-1635"
+   ]
+  },
+  {
+   "path": "kpa-backup/2026-11-13/dataCache.after.json",
+   "type": "1 个文件",
+   "bytes": 5792890,
+   "why": "旧版缓存快照",
+   "sample": [
+    "kpa-backup/2026-11-13/dataCache.after.json"
+   ]
+  },
+  {
+   "path": "kpa-backup/2026-11-13/dataCache.after2.json",
+   "type": "1 个文件",
+   "bytes": 5789917,
+   "why": "旧版缓存快照（与 health/dataCache.json 内容重复）",
+   "sample": [
+    "kpa-backup/2026-11-13/dataCache.after2.json"
+   ]
+  },
+  {
+   "path": "kpa-backup/2026-11-12-2245/galaga_removal/dataCache.json.before",
+   "type": "1 个文件",
+   "bytes": 5783864,
+   "why": "旧版缓存快照",
+   "sample": [
+    "kpa-backup/2026-11-12-2245/galaga_removal/dataCache.json.before"
+   ]
+  },
+  {
+   "path": "tools/platform-tools.zip",
+   "type": "1 个文件",
+   "bytes": 16110554,
+   "why": "platform-tools 安装包；已解压到 tools/platform-tools/，adb/fastboot/sqlite3 均可用",
+   "sample": [
+    "tools/platform-tools.zip"
+   ]
+  },
+  {
+   "path": "kpa-backup/2026-11-13/health/zipsample/**",
+   "type": "13 个文件",
+   "bytes": 65088734,
+   "why": "本轮为复核 ROM 包临时拉取的 zip 样本，验证已完成",
+   "sample": [
+    "kpa-backup/2026-11-13/health/zipsample/gba/白夜BGM重置版2（原描边+原披风残影）.zip",
+    "kpa-backup/2026-11-13/health/zipsample/gba/钻地小子A.zip",
+    "kpa-backup/2026-11-13/health/zipsample/gba/世界传说 换装迷宫2.zip",
+    "kpa-backup/2026-11-13/health/zipsample/gba/幸运的卢克 通缉犯.zip"
+   ]
+  },
+  {
+   "path": "56 组完全重复文件（md5 相同）的冗余副本 · 完整清单见 health/duplicate_list.txt",
+   "type": "109 个文件",
+   "bytes": 21886766,
+   "why": "同一文件的第 2 份及以后副本，每组保留 1 份即可；含 EASYRPG 封面双份、诊断截图重复、dataCache 快照",
+   "sample": [
+    "kpa-backup/2026-11-13/health/dataCache.json",
+    "kpa-deploy/tm/dc_cur.json",
+    "kpa-backup/2026-11-13/easyrpg_covers/Imgs/野比大雄的双截龙.png",
+    "kpa-backup/2026-11-13/easyrpg_backup/Imgs/怪异症候群1.png"
+   ]
+  }
+ ],
+ "local_decide": [
+  {
+   "path": "kpa-deploy/Mupen64PlusFZ-pro-backup.apk",
+   "type": "1 个文件",
+   "bytes": 32960547,
+   "why": "独立 N64 模拟器 APK 备份（31MB）；现用 RA 的 mupen64plus_next 核心，此 APK 未整合进天马。删掉后本机不再留存该安装包"
+  },
+  {
+   "path": "kpa-deploy/OpenBOR-7533.apk",
+   "type": "1 个文件",
+   "bytes": 5557354,
+   "why": "OpenBOR 安装包（5.3MB），天马无 OPENBOR 集合，未使用"
+  },
+  {
+   "path": "kpa-deploy/MSYH.TTF",
+   "type": "1 个文件",
+   "bytes": 10206456,
+   "why": "微软雅黑字体（9.7MB）；设备 /storage/emulated/0/RetroArch/MSYH.TTF 已有一份"
+  },
+  {
+   "path": "kpa-deploy/MSYH2.TTF",
+   "type": "1 个文件",
+   "bytes": 8508624,
+   "why": "第二份字体（8.1MB），设备上没有对应文件，从未推送"
+  },
+  {
+   "path": "kpa-backup/2026-11-13/audit/shots/**",
+   "type": "113 个文件",
+   "bytes": 15568793,
+   "why": "113 张逐样本验证截图，是上一轮报告的原始证据；报告已内嵌 4 张拼图"
+  },
+  {
+   "path": "kpa-backup/2026-11-13/titles/**",
+   "type": "62 个文件",
+   "bytes": 2718985,
+   "why": "EasyRPG 标题画面素材（62 个文件），封面已生成部署完毕"
+  },
+  {
+   "path": "kpa-backup/2026-11-13/xyz_decoded/**",
+   "type": "25 个文件",
+   "bytes": 2224906,
+   "why": "XYZ 解码中间图，封面已生成"
+  }
+ ],
+ "local_keep": [
+  {
+   "path": "~/.workbuddy/skills/kpa-game-setup/（上架版 skill）",
+   "type": "目录",
+   "why": "用户明确要求本机只保留上架版，保留"
+  },
+  {
+   "path": "tools/platform-tools/adb 等",
+   "type": "工具",
+   "why": "后续同步/排障必需，保留"
+  },
+  {
+   "path": "theme/GameDetails.qml.before20261113",
+   "type": "文件",
+   "why": "QML 原版，回滚点，保留"
+  },
+  {
+   "path": "edit/*.before.txt / *.after.txt",
+   "type": "文件",
+   "why": "metadata 改动的 diff 依据，保留"
+  },
+  {
+   "path": "msx_cfg_backup/retroarch.cfg.ORIGINAL_URL",
+   "type": "文件",
+   "why": "唯一有效的 cfg 官方源原版，保留"
+  },
+  {
+   "path": "theme/GameDetails.qml.improved / 报告 HTML",
+   "type": "文件",
+   "why": "交付物，保留"
+  }
+ ],
+ "sum_dev_delete": 18241735,
+ "sum_local_delete": 173130456,
+ "sum_local_decide": 77745665,
+ "sum_local_delete_raw": 178387821,
+ "local_delete_unique_files": 136
+}
