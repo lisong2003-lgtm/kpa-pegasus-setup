@@ -12,7 +12,7 @@ RA_FILES="$INT/Android/data/$RA_PKG/files"
 if sh "test -f $RA_FILES/retroarch.cfg && grep -q 'savestate_auto_load = \"false\"' $RA_FILES/retroarch.cfg"; then
   echo "SKIP  RA 主配置已存在"
 else
-  "$ADB" push "$GOLD/retroarch.cfg" "$RA_FILES/retroarch.cfg" || die "RA 主配置推送失败"
+  "$ADB" push "$GOLD/retroarch.cfg.txt" "$RA_FILES/retroarch.cfg" || die "RA 主配置推送失败"
   echo "OK    RA 主配置（960x640 满屏/菜单按键/性能）已部署"
 fi
 

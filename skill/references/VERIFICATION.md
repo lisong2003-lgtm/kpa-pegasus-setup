@@ -28,7 +28,7 @@
 | `WS/恐怖传说.zip` 坏 ROM | TorrentZip，本机标准库报 `invalid code lengths set`，实机 20 秒纯黑；同平台《恐怖传说2》正常 | 换 ROM 或按前例从天马移除（保留 ROM + 封面） |
 | `Roms/_backup_20261112_2347/` 幽灵 metadata | 备份目录被递归扫描，多算 1 个游戏（幽灵 galaga），`lastrun.log` 产生 455+ 条「文件不存在」警告；改 `game_dirs.txt` 无效 | 删除该备份目录（Mac 侧有完整备份）；需用户确认后执行 |
 | 空壳简介 1142 条（约 30.3%） | 「《X》，X 平台。」模板句，详情页信息量低；16 个平台缺 publisher/genre/release | `bash scripts/bangumi_desc.py --push`（需 bgm.tv 可达网络，带缓存/限速/断点续跑） |
-| 详情页观感待实机确认 | QML 增强版已推送、清缓存无报错、主界面正常；远程输入无法稳定停在详情页那一屏 | 实机目视；不满意用 `GameDetails.qml.before20261113` 回滚 |
+| 详情页观感待实机确认 | QML 增强版已推送、清缓存无报错、主界面正常；远程输入无法稳定停在详情页那一屏 | 实机目视；不满意用 `GameDetails.before.qml.txt` 回滚 |
 | `.nomedia` TF 卡卷 | 内部存储重扫立即生效；TF 卡 `public:179,129` 重扫无效 | 重启一次后确认图库素材消失 |
 | 系统桌面壁纸 | AYA 桌面只认内置壁纸；系统层（锁屏/系统）戴夫日落图已设置 | 桌面壁纸需手动在「掌机设置 → 个性化 → 系统壁纸」选内置图 |
 | 设备侧清理清单未执行 | 17 项 / 17.40MB | 按第 5 节流程执行 |
@@ -39,8 +39,8 @@
 
 | 路径 | 用途 |
 |---|---|
-| `theme/GameDetails.qml.before20261113`（设备侧 `.bak20261113`） | 详情页增强的唯一原版回滚点，9KB |
-| `assets/golden/GameDetails.qml.improved` | 增强版 |
+| `theme/GameDetails.before.qml.txt`（设备侧 `.bak20261113`） | 详情页增强的唯一原版回滚点，9KB |
+| `assets/golden/GameDetails.improved.qml.txt` | 增强版 |
 | `msx_cfg_backup/retroarch.cfg.ORIGINAL_URL` | 唯一有效的 cfg 官方源原版（另一份 `.bak_msx_url` 指向已关闭的本地镜像，是无效备份） |
 | `edit/*.before.txt`、`edit/game_dirs/game_dirs.before.txt` | metadata / game_dirs 改动 diff 依据 |
 | `RetroArch/system/firmware.bin.bak` | BIOS/固件备份，牵涉核心启动 |

@@ -115,9 +115,9 @@ MSX 冷启动约 15–18 秒出日文字符界面，不是黑屏。脚本见 `sc
 
 视觉根因：`gamedetails` 是 mainList 第 2 页（需按 ↓），未选中 `opacity: selected ? 1 : 0.5`、标题 `vpx(24)`、简介 `vpx(18)`、`elide: Text.ElideRight` 截断长文、无背景卡片。
 
-增强版 `assets/golden/GameDetails.qml.improved`：opacity 0.5→0.85、加半透明卡片 + 橙色强调条、标题 24→30、简介 18→25、去掉 elide、`lineHeight: 1.3`、左右 margin。固定色写法（不要用 `theme.highlight || ...`，该主题未定义会回退失败）。
+增强版 `assets/golden/GameDetails.improved.qml.txt`：opacity 0.5→0.85、加半透明卡片 + 橙色强调条、标题 24→30、简介 18→25、去掉 elide、`lineHeight: 1.3`、左右 margin。固定色写法（不要用 `theme.highlight || ...`，该主题未定义会回退失败）。
 
-原版回滚点 `assets/golden/GameDetails.qml.before20261113`（设备侧 `.bak20261113`）。推送后清 `dataCache.json` 重启，检查 logcat 无 QML/QQml 报错。**远程输入无法稳定停在详情页那一屏**（方向键/滑动被解释成切换集合），观感必须实机确认。脚本见 `scripts/kpa_gamedetails.sh`。
+原版回滚点 `assets/golden/GameDetails.before.qml.txt`（设备侧 `.bak20261113`）。推送后清 `dataCache.json` 重启，检查 logcat 无 QML/QQml 报错。**远程输入无法稳定停在详情页那一屏**（方向键/滑动被解释成切换集合），观感必须实机确认。脚本见 `scripts/kpa_gamedetails.sh`。
 
 内容侧：3772 条 description 平均 46.3 字，约 30%（1142 条）是「《X》，X 平台。」空壳句；用 `scripts/bangumi_desc.py` 升级为真简介并回填 16 个平台的 publisher/genre/release。
 

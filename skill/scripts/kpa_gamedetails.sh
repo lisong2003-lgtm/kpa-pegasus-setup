@@ -5,7 +5,7 @@ set -euo pipefail
 source "$(dirname "$0")/kpa_env.sh"
 require_device
 
-SRC="$KPA_SKILL_DIR/assets/golden/GameDetails.qml.improved"
+SRC="$KPA_SKILL_DIR/assets/golden/GameDetails.improved.qml.txt"
 [ -f "$SRC" ] || die "缺少 $SRC"
 THEME="/sdcard/pegasus-frontend/themes/prosperoOS"
 TARGET="$THEME/GameDetails.qml"
@@ -22,4 +22,4 @@ echo "== 3/3 清缓存 =="
 sh "rm -f /sdcard/pegasus-frontend/dataCache.json" >/dev/null
 
 echo "完成。重启天马，检查 logcat 无 QML/QQml 报错，实机看详情页观感。"
-echo "不满意用 $TARGET.bak$STAMP 回滚；随包另附 assets/golden/GameDetails.qml.before20261113 原版。"
+echo "不满意用 $TARGET.bak$STAMP 回滚；随包另附 assets/golden/GameDetails.before.qml.txt 原版。"

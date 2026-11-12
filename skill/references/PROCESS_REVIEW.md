@@ -66,7 +66,7 @@
 ### 阶段 P6 — 收尾四项决定与 MSX 本地镜像安装（11-13 00:00 → 01:35）
 
 - **目标**：解决长期阻塞的 MSX 核心、`.nomedia`、QML 增强推送、坏 ROM/换核心、ANDROID 集合修复、EASYRPG 封面重做、抽样验证。
-- **执行动作**：用户手动下载 blueMSX 卡在 14%（官方源 17.5KB/s）→ 用「方案 C 本地 HTTP 核心源」成功安装；加 4 个 `.nomedia` + `scan_volume`；推送 `GameDetails.qml.improved`；移除 CPS1/dynwarjr、SFC/超级炸弹人4，mercsj/samuraia/sonicwi 换 fbneo 核心 + 补竖版 cfg；ANDROID 集合改 `.app` 占位；EASYRPG 13 张封面从 `.xyz` 标题画面解码重做；113 个样本全平台抽样验证。
+- **执行动作**：用户手动下载 blueMSX 卡在 14%（官方源 17.5KB/s）→ 用「方案 C 本地 HTTP 核心源」成功安装；加 4 个 `.nomedia` + `scan_volume`；推送 `GameDetails.improved.qml.txt`；移除 CPS1/dynwarjr、SFC/超级炸弹人4，mercsj/samuraia/sonicwi 换 fbneo 核心 + 补竖版 cfg；ANDROID 集合改 `.app` 占位；EASYRPG 13 张封面从 `.xyz` 标题画面解码重做；113 个样本全平台抽样验证。
 - **关键命令 / 路径**：`python3 -m http.server 8765 --bind 0.0.0.0` + 临时改两份 `retroarch.cfg` 的 `core_updater_buildbot_cores_url` → `http://192.168.x.x:8765/`；`input motionevent DOWN x y` + 0.3s + `UP x y`；`audit/probe.py`、`KPA_verification_report.html`、`KPA_changes_2026-11-13.html`。
 - **结果**：任务 #5/#25/#30–#33 全部 completed；`3771 games / 36 collections`；MSX 冷启动 ~15s 出日文界面；图库噪音内部存储消失。
 
@@ -157,8 +157,8 @@ remaps config/remaps/<核心>/<核心>.rmp        （核心级 remap，作用于
 
 - 视觉根因：`gamedetails` 是 mainList 第 2 页（需按 ↓），未选中时 `opacity: selected ? 1 : 0.5`，标题 `vpx(24)`、简介 `vpx(18)`，`elide: Text.ElideRight` 截断长文，无背景卡片/强调条。
 - 内容根因：3772 条 description 平均 46.3 字，**约 30% 是「《X》，X 平台。」空壳模板句**；16 个平台完全没有 publisher/genre/release → 「More by 厂商」空白。
-- `GameDetails.qml.improved`（已推送）：opacity 0.5→0.85、加半透明卡片 + 强调条、标题 24→30、简介 18→25、去掉 elide、lineHeight 1.3。清 `dataCache.json` 重启天马后主界面正常、logcat 无 QML/QQml 报错。
-- 备份 `theme/GameDetails.qml.before20261113` + 设备 `.bak20261113` 可回滚。**远程输入无法稳定停在详情页那一屏（方向键/滑动被解释成切换集合），观感待用户实机确认**。
+- `GameDetails.improved.qml.txt`（已推送）：opacity 0.5→0.85、加半透明卡片 + 强调条、标题 24→30、简介 18→25、去掉 elide、lineHeight 1.3。清 `dataCache.json` 重启天马后主界面正常、logcat 无 QML/QQml 报错。
+- 备份 `theme/GameDetails.before.qml.txt` + 设备 `.bak20261113` 可回滚。**远程输入无法稳定停在详情页那一屏（方向键/滑动被解释成切换集合），观感待用户实机确认**。
 
 ### 2.8 EASYRPG 封面重做
 
@@ -239,7 +239,7 @@ remaps config/remaps/<核心>/<核心>.rmp        （核心级 remap，作用于
 
 | 类别 | 内容 |
 |---|---|
-| 前端 | `/sdcard/pegasus-frontend/`：`settings.txt`（prosperoOS）、`themes/prosperoOS/`（含 `GameDetails.qml.improved`、`davebg.jpg`、Logo 补齐）、`dataCache.json`（运行时缓存）、`game_dirs.txt` |
+| 前端 | `/sdcard/pegasus-frontend/`：`settings.txt`（prosperoOS）、`themes/prosperoOS/`（含 `GameDetails.improved.qml.txt`、`davebg.jpg`、Logo 补齐）、`dataCache.json`（运行时缓存）、`game_dirs.txt` |
 | RA 全局 | 两份 `retroarch.cfg`（黑黄 ozone / vulkan / CRT / 96ms / 存档迁 TF / 官方核心源） |
 | RA 配置 | `config/<核心>/*.cfg/.opt/.slangp`、`config/global_*.slangp`、`config/remaps/`（厂商基线）、216 个竖版 per-game cfg |
 | ROM / 封面 | `<TF>/Roms/` 36 平台 3770 条 metadata + 封面、216 竖版 cfg、ANDROID 7 个 `.app` 占位 + `Imgs/` |
@@ -276,7 +276,7 @@ remaps config/remaps/<核心>/<核心>.rmp        （核心级 remap，作用于
 | **`WS/恐怖传说.zip` 坏 ROM** | TorrentZip，本机标准库 `invalid code lengths set`，实机 20 秒纯黑；同平台《恐怖传说2》正常 | 换 ROM 或按前例从天马移除，**未动** |
 | **`_backup_20261112_2347` 幽灵 metadata** | 备份目录被天马递归扫描，多算 1 条游戏（幽灵 galaga），`lastrun.log` 产生 455+ 条「文件不存在」警告；改 `game_dirs.txt` 无效（天马重写回原样） | 删除该备份目录；在清理确认后执行 |
 | **空壳简介 1142 条**（#28 记 1143 / 30.3%） | 「《X》，X 平台。」模板句，详情页信息量低；16 平台（ANDROID/ATOMISWAVE/DOS/DREAMCAST/EASYRPG/FC/MDCD/MSX/NAOMI/NDS/PCECD/PICO/PS/PSP/SATURN/SFC）缺 publisher/genre/release | `scripts/bangumi_desc.py --push`（需 bgm.tv 可达网络，带缓存/限速/断点续跑，回家网络跑）升级为真简介并回填字段 |
-| **详情页观感待实机确认** | QML 增强版已推送、清缓存无报错、主界面正常，但远程输入无法稳定停在详情页那一屏 | 用户实机确认；不满意用 `GameDetails.qml.before20261113` 回滚 |
+| **详情页观感待实机确认** | QML 增强版已推送、清缓存无报错、主界面正常，但远程输入无法稳定停在详情页那一屏 | 用户实机确认；不满意用 `GameDetails.before.qml.txt` 回滚 |
 | **清理清单未执行** | 设备侧 17 项 / 17.40MB、本机 136 文件 / 165.11MB、需用户决定 74.14MB；#38 in_progress | 按用户「清理前先确认目录及影响」偏好，**先备份、分批（≤10 项）执行、每批校验**；本轮只出清单未删 |
 | **skill 与最终状态不一致** | `SKILL.md` 竖版 remap 仍写厂商原版 `up=h0left…`（设备已是 `up=h0right…`）；机型名误写 AYANEO Pocket Advance（应为 KONKR Pocket ADVANCE） | 同步更新 SKILL.md（本次复盘不改） |
 | 已移除 / 换核心项 | galaga、古惑狼赛车、GG雅士达3、CPS1/dynwarjr、SFC/超级炸弹人4 已移除（部分保留 ROM+封面便于换回）；mercsj/samuraia/sonicwi 已换 fbneo + 补竖版 cfg | 已验证；无需再动 |

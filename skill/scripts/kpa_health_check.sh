@@ -1,11 +1,11 @@
 #!/bin/bash
-# 全库静态校验（只读，不改设备）。
+# 全库静态校验（只读，不改设备、不污染包目录）。
 #   bash kpa_health_check.sh                 # 设备在线：拉取 36 平台 metadata 并核对 ROM/封面存在性
 #   bash kpa_health_check.sh --local [DIR]  # 离线：分析本机 metadata 目录（默认 assets/meta_latest）
-# 不覆盖任何文件；存在性检查走设备端 test -e，判据见 references/VERIFICATION.md。
 set -euo pipefail
 
 MODE=device
+OUTPATH=""
 if [ "${1:-}" = "--local" ]; then
   MODE=local
   DIR="${2:-$(cd "$(dirname "$0")/.." && pwd)/assets/meta_latest}"
@@ -13,7 +13,8 @@ else
   source "$(dirname "$0")/kpa_env.sh"
   require_device
   DIR=$(mktemp -d)
-  trap 'rm -rf "$DIR"' EXIT
+  OUTPATH=$(mktemp /tmp/kpa_check_paths.XXXXXX)
+  trap 'rm -rf "$DIR" "$OUTPATH"' EXIT
   echo "== 拉取设备 metadata =="
   sh "find $TF/Roms -name metadata.pegasus.txt" | tr -d '\r' | while IFS= read -r p; do
     [ -n "$p" ] || continue
@@ -22,9 +23,9 @@ else
   done
 fi
 
-python3 - "$DIR" "$MODE" <<'PY'
+python3 - "$DIR" "$MODE" "$OUTPATH" <<'PY'
 import sys, os, glob, collections
-d, mode = sys.argv[1], sys.argv[2]
+d, mode, out = sys.argv[1], sys.argv[2], sys.argv[3]
 files = sorted(glob.glob(os.path.join(d, "*.txt")))
 total, issues, paths, per_platform = 0, collections.Counter(), [], []
 for f in files:
@@ -64,7 +65,8 @@ for f in files:
 print(f"MODE={mode}  platforms={len(files)}  games={total}")
 print("  " + "  ".join(f"{p}:{n}" for p, n in per_platform))
 print("ISSUES:", dict(issues) if issues else "none")
-open(os.path.join(d, "_check_paths.txt"), "w", encoding="utf-8").write("\n".join(paths) + "\n")
+if out:
+    open(out, "w", encoding="utf-8").write("\n".join(paths) + "\n")
 PY
 
 if [ "$MODE" = device ]; then
@@ -79,7 +81,7 @@ while IFS= read -r p; do
 done < /sdcard/kpa_check_paths.txt
 echo "RESULT checked=$n missing=$miss"
 EOS
-  "$ADB" push "$DIR/_check_paths.txt" /sdcard/kpa_check_paths.txt >/dev/null
+  "$ADB" push "$OUTPATH" /sdcard/kpa_check_paths.txt >/dev/null
   "$ADB" push /tmp/kpa_check_dev.sh /sdcard/kpa_check_dev.sh >/dev/null
   echo "== 设备端 ROM / 封面存在性 =="
   sh "sh /sdcard/kpa_check_dev.sh '$TF/Roms'"

@@ -21,7 +21,7 @@ locale: zh-CN
 
 本包是**实机工程沉淀**，不是通用模拟器教程：所有路径、按键码、旋转值均来自该机型验证。脚本幂等，可重复运行修复。
 
-> **不携带版权与大文件**：APK、BIOS、遮罩 PNG、ROM 均不随包分发。`assets/golden/` 只放配置文本、主题包与 QML 修改；如需离线完整版，用 `scripts/sync_from_device.sh` 从已配置好的机器拉取（仅供个人使用，勿再发布）。
+> **不携带版权与大文件**：APK、BIOS、遮罩 PNG、ROM 均不随包分发。SkillHub / ClawHub 只允许文本类文件，因此 **prosperoOS 主题包与背景图放在 GitHub 仓库 `assets-heavy/`**（`step2_theme.sh` 检测到缺失会打印获取指引并跳过，不影响其余步骤）；`assets/golden/` 只放配置文本与 QML 修改。如需离线完整版，克隆 GitHub 仓库，或用 `scripts/sync_from_device.sh` 从已配置好的机器拉取（仅供个人使用，勿再发布）。
 
 ## 必须遵守：硬性禁令
 
@@ -93,7 +93,7 @@ bash scripts/run_all.sh     # step1..step7，幂等，可重跑
 - **ANDROID 集合**：`file:` 必须是**真实存在的文件**。写 `<包名>/<Activity>` 会被 Pegasus 丢弃，表现为整个集合不显示。正确写法：`extensions: app` + `file: <游戏名>.app`（占位空文件）+ 每个游戏一条 `launch: am start --user 0 -n <包名>/<Activity>`。封面用 `adb exec-out screencap` 截启动画面。
 - **核心安装**：RA APK 内置约 83 核心，覆盖全部平台唯缺 MSX。MSX 官方源慢（约 17.5KB/s）会卡在 14%；本地镜像法：把已有 `.so` 打成 zip + 造 `.index-extended`（每行 `日期 哈希 文件名`，**不是 `.index`**）+ 临时改**两份** `retroarch.cfg` 的 `core_updater_buildbot_cores_url` 指向 Mac 的 HTTP 服务，让 RA 自己下载解压到私有 cores 目录；装完改回官方源并关服务。MSX 冷启动约 15–18 秒，不是黑屏。
 - **RA 菜单自动化**：`input tap` / 大部分 `keyevent` 无效（固件走内核 evdev 直读）；只有 `input motionevent DOWN x y` + 0.3s + `UP x y`、BACK(4)、方向键 19/20/21/22 有效。
-- **metadata / 详情页**：`description:` 支持，多行值后续行缩进两空格；详情页 `GameDetails.qml` 原版未选中 `opacity=0.5`、简介 `vpx(18)` + `elide` 截断，观感弱。增强版在 `assets/golden/GameDetails.qml.improved`，原版回滚点 `GameDetails.qml.before20261113`。空壳模板句约 1142 条，用 `bangumi_desc.py` 升级。
+- **metadata / 详情页**：`description:` 支持，多行值后续行缩进两空格；详情页 `GameDetails.qml` 原版未选中 `opacity=0.5`、简介 `vpx(18)` + `elide` 截断，观感弱。增强版在 `assets/golden/GameDetails.improved.qml.txt`，原版回滚点 `GameDetails.before.qml.txt`。空壳模板句约 1142 条，用 `bangumi_desc.py` 升级。
 - **`.nomedia`**：Roms / RetroArch / pegasus-frontend / pocketmuseum 四处；隐藏图库素材但不删文件、不影响天马按路径读封面。内部存储 `scan_volume` 立即生效，TF 卡需重启。
 - **PPSSPP**：targetSdk 35 无 `MANAGE_EXTERNAL_STORAGE`，读不到 TF 卡 ROM，必须把 PSP ROM 拷一份到 app 私有 `files/` 并 chmod 666，**双份均为必需勿删**；RetroArch 无 PPSSPP 核心（加载即崩）。
 - **其他**：ATOMISWAVE 裸 `.bin` 可直接玩（首屏 NOTICE 约 20–30 秒，曾被误判不兼容）；GBA 不要加遮罩（240×160 = 原生满屏 960×640）；封面修复优先 libretro thumbnails，其次实机截图裁 480×320，再不行做标题占位图；中文 zip 条目名会让 toybox `unzip` 误报 CRC BAD，本机 Python `zipfile` 复核为准。

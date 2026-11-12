@@ -3,7 +3,7 @@
 source "$(dirname "$0")/kpa_env.sh"
 require_device
 
-CORES_TSV="$KPA_SKILL_DIR/assets/data/platform_cores.tsv"
+CORES_TSV="$KPA_SKILL_DIR/assets/data/platform_cores.tsv.txt"
 ORIENT="$KPA_SKILL_DIR/assets/data/mame_orient.json"
 
 # 生成设备端脚本

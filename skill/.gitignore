@@ -1,9 +1,0 @@
-.DS_Store
-._*
-__pycache__/
-*.pyc
-.msx_mirror/
-*.kpatmp
-*.bakKPA3
-final/
-cache.json

@@ -12,7 +12,7 @@ if sh "test -f $PPS_FILES/PSP/SYSTEM/ppsspp.ini && grep -q 'DisplayStretch' $PPS
 else
   sh "mkdir -p $PPS_FILES/PSP/SYSTEM"
   bak "$PPS_FILES/PSP/SYSTEM/ppsspp.ini" .bakKPA3
-  "$ADB" push "$GOLD/ppsspp.ini" "$PPS_FILES/PSP/SYSTEM/ppsspp.ini" || die "ppsspp.ini 推送失败"
+  "$ADB" push "$GOLD/ppsspp.ini.txt" "$PPS_FILES/PSP/SYSTEM/ppsspp.ini" || die "ppsspp.ini 推送失败"
   echo "OK    ppsspp.ini 已部署（满屏拉伸 + 关闭虚拟键）"
 fi
 

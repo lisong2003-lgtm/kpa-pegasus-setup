@@ -51,9 +51,10 @@ references/
   PLAYBOOK.md               分项实操手册
   VERIFICATION.md           健康校验 SOP、遗留项、清理清单、回滚点
 scripts/                    幂等安装脚本 + 专项工具
-assets/golden/              配置文本、prosperoOS 主题包、QML 增强版与原版
+assets/golden/              配置文本、QML 增强版与原版（无二进制）
 assets/data/                平台→核心映射、竖版方向库、BIOS 清单
 assets/meta_latest/         36 平台 metadata 模板
+assets-heavy/               （仅本仓库）prosperoOS 主题包与背景图，文本版发行包不含
 archive/                    （仅本仓库）工程报告、校验数据与回滚点
 ```
 
@@ -73,7 +74,7 @@ archive/                    （仅本仓库）工程报告、校验数据与回�
 
 ## 说明
 
-- **不含 ROM / BIOS / APK / 遮罩素材**。这些是版权或超大文件，需自备；清单见 `assets/data/bios_list.txt`。`assets/golden/` 只放配置文本、自建主题修改与 QML。
+- **不含 ROM / BIOS / APK / 遮罩素材**，需自备（清单见 `assets/data/bios_list.txt`）。SkillHub / ClawHub 只允许文本类文件，故 prosperoOS 主题包与背景图放在本仓库 `assets-heavy/`；从 GitHub 克隆完整版后把它们拷进 `skill/assets/golden/` 即可，`step2_theme.sh` 检测到缺失会打印获取指引并跳过，其余步骤不受影响。
 - 归档报告已对设备序列号、局域网 IP 与本机用户名脱敏。
 - 所有路径与按键码针对该机型实测；换机型请重新核对 TF 卡挂载点、分辨率与按键码。
 - 清理与回滚有严格纪律：先出只读清单、说明影响、获确认，分批 ≤10 项、每批校验。设备删除无废纸篓。

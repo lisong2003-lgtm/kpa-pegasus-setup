@@ -25,7 +25,7 @@
 - `references/HARD_RULES.md`：22 条硬性禁令与正确做法。
 - `references/PLAYBOOK.md`：9 个分项实操手册。
 - `references/VERIFICATION.md`：健康校验 SOP、达标基线、遗留项、清理清单、回滚点。
-- `assets/golden/GameDetails.qml.improved` 与 `.before20261113`。
+- `assets/golden/GameDetails.improved.qml.txt` 与 `.before20261113`。
 - `README.md`、`.gitignore`、本文件；GitHub 仓库 `archive/` 归档工程报告与回滚点（已脱敏）。
 
 ### 记录

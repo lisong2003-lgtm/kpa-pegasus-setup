@@ -37,8 +37,8 @@ echo "== 4/4 拉取天马配置 =="
 for f in settings.txt game_dirs.txt; do
   "$ADB" pull "/sdcard/pegasus-frontend/$f" "$GOLD/$f" >/dev/null 2>&1 && echo "OK $f"
 done
-"$ADB" pull "$INT/Android/data/$RA_PKG/files/retroarch.cfg" "$GOLD/retroarch.cfg" >/dev/null 2>&1 && echo "OK retroarch.cfg"
-"$ADB" pull "/sdcard/Android/data/$PPS_PKG/files/PSP/SYSTEM/ppsspp.ini" "$GOLD/ppsspp.ini" >/dev/null 2>&1 && echo "OK ppsspp.ini"
+"$ADB" pull "$INT/Android/data/$RA_PKG/files/retroarch.cfg" "$GOLD/retroarch.cfg.txt" >/dev/null 2>&1 && echo "OK retroarch.cfg"
+"$ADB" pull "/sdcard/Android/data/$PPS_PKG/files/PSP/SYSTEM/ppsspp.ini" "$GOLD/ppsspp.ini.txt" >/dev/null 2>&1 && echo "OK ppsspp.ini"
 
 du -sh "$KPA_SKILL_DIR/assets/apks" "$GOLD"
 echo "同步完成。注意：BIOS 为版权固件，重建的重资产目录仅供个人离线装机，请勿公开发布。"
