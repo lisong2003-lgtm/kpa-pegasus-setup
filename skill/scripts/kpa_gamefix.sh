@@ -49,7 +49,22 @@ set_kv() {
   sh "f='$f'; k='$k'; v='$v'; touch \"\$f\"; if grep -q \"^\$k = \" \"\$f\"; then sed -i \"s|^\$k = .*|\$k = \\\"\$v\\\"|\" \"\$f\"; else printf '%s = \"%s\"\\n' \"\$k\" \"\$v\" >> \"\$f\"; fi" </dev/null
 }
 
-# restore <设备文件>：从 .bakKPA3 回滚
+# revert_kv <设备文件> <键> <原值>：把键改回原值；原值传空表示删除该行
+# 为什么不用 cp 备份回滚：同一份 cfg 可能被多次脚本/手工改动，.bak 很容易在某次
+# "改完之后" 被创建，从而变成"已改版"备份 —— 此时 cp 回去等于没回滚。值级回滚更可靠。
+revert_kv() {
+  local f="$1" k="$2" v="$3"
+  if [ -z "$v" ]; then
+    say "  REVERT $(basename "$f"): 删除 $k 行"
+    sh "sed -i '/^$k = /d' '$f'" </dev/null
+  else
+    say "  REVERT $(basename "$f"): $k = \"$v\""
+    sh "sed -i 's|^$k = .*|$k = \"$v\"|' '$f'" </dev/null
+  fi
+  return 0
+}
+
+# restore <设备文件>：从 .bakKPA3 整份回滚（仅用于确认备份是改动前版本的场合）
 restore() {
   local f="$1"
   if sh "[ -f '$f.bakKPA3' ] && echo yes" </dev/null 2>/dev/null | tr -d '\r' | grep -q yes; then
@@ -64,7 +79,11 @@ fix_dos() {
   say "[dos] DOSBox-pure：关闭倒带与自动存档"
   say "      根因：全局 rewind_enable=true，而 DOSBox-pure 进来先停在 START MENU、游戏尚未运行，"
   say "            存状态必然失败 -> 左下角 'Save State Error: Unable to save state while game is not running.'"
-  if [ "$REVERT" = 1 ]; then restore "$DOS_CFG"; return; fi
+  if [ "$REVERT" = 1 ]; then
+    revert_kv "$DOS_CFG" rewind_enable true
+    revert_kv "$DOS_CFG" savestate_auto_save true
+    return
+  fi
   set_kv "$DOS_CFG" rewind_enable false
   set_kv "$DOS_CFG" savestate_auto_save false
 }
@@ -73,7 +92,12 @@ fix_nds() {
   say "[nds] melonDS：双屏上下排列 + 核心原始宽高比"
   say "      根因：screen_layout=Left/Right 且 aspect_ratio_index=23，两屏并排后又被拉满屏，纵向变形。"
   say "            实测 index 21/22 才是核心原始比例（亮像素宽约 408px）；23/24 会拉满 918px。"
-  if [ "$REVERT" = 1 ]; then restore "$NDS_OPT"; restore "$NDS_CFG"; return; fi
+  if [ "$REVERT" = 1 ]; then
+    revert_kv "$NDS_OPT" melonds_screen_layout "Left/Right"
+    revert_kv "$NDS_OPT" melonds_touch_mode "Mouse"
+    revert_kv "$NDS_CFG" aspect_ratio_index 23
+    return
+  fi
   set_kv "$NDS_OPT" melonds_screen_layout "Top/Bottom"
   set_kv "$NDS_OPT" melonds_touch_mode "Touchscreen"
   set_kv "$NDS_CFG" aspect_ratio_index 21
@@ -82,7 +106,7 @@ fix_nds() {
 fix_flycast() {
   say "[flycast] 关闭多线程渲染"
   say "      根因：Atomiswave 下 reicast_threaded_rendering=enabled 会导致背景满屏随机雪花噪点。"
-  if [ "$REVERT" = 1 ]; then restore "$FLY_OPT"; return; fi
+  if [ "$REVERT" = 1 ]; then revert_kv "$FLY_OPT" reicast_threaded_rendering "enabled"; return; fi
   set_kv "$FLY_OPT" reicast_threaded_rendering "disabled"
 }
 
@@ -100,7 +124,11 @@ fix_aw_osd() {
   while IFS= read -r name; do
     [ -z "$name" ] && continue
     n=$((n+1))
-    set_kv "$RA_CONFIG/Flycast/$name.cfg" video_font_enable false
+    if [ "$REVERT" = 1 ]; then
+      revert_kv "$RA_CONFIG/Flycast/$name.cfg" video_font_enable ""
+    else
+      set_kv "$RA_CONFIG/Flycast/$name.cfg" video_font_enable false
+    fi
   done < "$listfile"
   rm -f "$listfile"
   say "      共 $n 个游戏配置已处理"

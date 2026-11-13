@@ -16,7 +16,7 @@
 
 ### 新增
 
-- `scripts/kpa_gamefix.sh`：`dos` / `nds` / `flycast` / `aw-osd` / `all`，默认 dry-run，`--apply` 写入、`--revert` 回滚，全部幂等。
+- `scripts/kpa_gamefix.sh`：`dos` / `nds` / `flycast` / `aw-osd` / `all`，默认 dry-run，`--apply` 写入、`--revert` 回滚，全部幂等。**回滚用值级还原而非文件恢复** —— 同一份 cfg 可能被多轮改动，`.bak` 很容易在某次"改完之后"被创建而变成"已改版"备份，此时 `cp` 回去等于没回滚（本次实测就踩到了）。
 - `scripts/kpa_theme_tweak.py`：主题 6 处增强，锚点失配会明确报告而不是写半成品；`--apply --restart` 一步到位。
 - `references/PLAYBOOK.md` 第 10 节：六类问题根因对照表、主题遮罩机制、NDS 比例客观定法、以及「一条走不通的路」（DOS 自动跳过启动菜单，含 15 个包启动项清单）。
 
