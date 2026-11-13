@@ -56,7 +56,7 @@ assets.box_front: Imgs/忍者神龟：施莱德的复仇.png
 
 `libretro_directory` 指向 `/data/user/0/com.retroarch.aarch64/cores/`，RA 从不读 public `RetroArch/cores/`。显示核查基线：`video_filter=""`（滤镜关）、`video_shader_enable=true` 命中 crt-easymode、厂商 `overlays/*_B.cfg` 边框正常、竖版 cfg 统一 `input_overlay_enable=false`。
 
-## 3. 竖版游戏（216 个 cfg）
+## 3. 竖版游戏（219 个 cfg）
 
 **最终统一值**（用户实机「1941 测试正常」）：
 
@@ -76,7 +76,7 @@ input_player1_select_btn = "96"
 ```
 
 - 厂商原版基线是反的：`up=h0left / down=h0right / left=h0down / right=h0up`（69 个 FBNEO cfg 字节级一致，md5 `44950e1a…`）。**翻转时只精确替换 4 行方向**，其余原样。
-- 分布：`MAME 2003-Plus` 140（rot=1）、`FinalBurn Neo` 69（rot=3）、CPS1 3 / CPS2 2 / NEOGEO 2（rot=3）。
+- 分布（2026-11-13 实测）：`MAME 2003-Plus` 140（rot=1）、`FinalBurn Neo` **72**（rot=3）、CPS1 3 / CPS2 2 / NEOGEO 2（rot=3），合计 **219**，方向映射 219/219 全部正确。早期文档写 216（FBNeo 69），差 3 个是后续补入，属口径漂移不是故障。
 - 竖版判定用 `assets/data/mame_orient.json`（6055 条），DB 缺的 4 个补 `gekiridn / tengaij / p47mus / schmeisr`。
 - 修已有 cfg 用 `bash scripts/kpa_vertical.sh`（默认 dry-run，`--apply` 才写）。
 
@@ -92,7 +92,7 @@ APK 未内置 bluemsx/fmsx；官方源约 17.5KB/s，手动下载会卡在 14%�
    格式每行 `日期 哈希 文件名`。只有 `.index` 时 RA 列表显示「没有可显示的条目」。
 3. Mac 起 `python3 -m http.server 8765 --bind 0.0.0.0`（目录即核心源目录）。
 4. 临时把**两份** `retroarch.cfg` 的 `core_updater_buildbot_cores_url` 改成 `http://<Mac 局域网 IP>:8765/`。
-5. RA 菜单：在线更新 → 核心下载 → BlueMSX（用 `input motionevent` 点）。RA 自己下载并解压到私有 cores 目录。
+5. RA 菜单：在线更新 → 核心下载 → BlueMSX —— **必须人手在掌机上点**。实测 adb 注入的 `input` 事件 RA 完全收不到（`sendevent` 亦无权限），详见 HARD_RULES 第 23 条。RA 自己下载并解压到私有 cores 目录。
 6. 验证 logcat `avc: granted { execute } .../cores/bluemsx_libretro_android.so`；**装完把两份 cfg 改回官方源 `http://buildbot.libretro.com/nightly/android/latest/arm64-v8a/` 并关掉 HTTP 服务**。
 7. MSX metadata 加 launch 行指向该核心；BIOS 在 `/storage/emulated/0/RetroArch/system/`（MSX.rom / MSX2.rom + Machines / Databases）。
 
@@ -117,7 +117,7 @@ MSX 冷启动约 15–18 秒出日文字符界面，不是黑屏。脚本见 `sc
 
 增强版 `assets/golden/GameDetails.improved.qml.txt`：opacity 0.5→0.85、加半透明卡片 + 橙色强调条、标题 24→30、简介 18→25、去掉 elide、`lineHeight: 1.3`、左右 margin。固定色写法（不要用 `theme.highlight || ...`，该主题未定义会回退失败）。
 
-原版回滚点 `assets/golden/GameDetails.before.qml.txt`（设备侧 `.bak20261113`）。推送后清 `dataCache.json` 重启，检查 logcat 无 QML/QQml 报错。**远程输入无法稳定停在详情页那一屏**（方向键/滑动被解释成切换集合），观感必须实机确认。脚本见 `scripts/kpa_gamedetails.sh`。
+原版回滚点 `assets/golden/GameDetails.before.qml.txt`（设备侧 `.bak20261113`）。推送后清 `dataCache.json` 重启，检查 logcat 无 QML/QQml 报错。**RA 完全不接收 adb 注入的输入**（见 HARD_RULES 23），所以详情页观感只能在掌机上目视确认。脚本见 `scripts/kpa_gamedetails.sh`。
 
 内容侧：3772 条 description 平均 46.3 字，约 30%（1142 条）是「《X》，X 平台。」空壳句；用 `scripts/bangumi_desc.py` 升级为真简介并回填 16 个平台的 publisher/genre/release。
 
@@ -147,3 +147,59 @@ MSX 冷启动约 15–18 秒出日文字符界面，不是黑屏。脚本见 `sc
 - 可用：`api.github.com`、gh-proxy 镜像、libretro thumbnails。thumbnails 目录索引走 `git/trees?recursive=1`，`contents` 分页无效。
 - 不可假设可达：GitHub raw、bgm.tv、wikipedia、thegamesdb、screenscraper。
 - macOS adb r34.0.5；大传输分块 55MB / 300 文件；`tar -T` 清单只放文件；校验用 `md5sum "路径"`（中文路径必须带双引号）。
+
+## 10. 实机体验类修复（v2.0.1）
+
+用户实测反馈的六类问题，全部已定位根因并修复。脚本：`scripts/kpa_gamefix.sh`（配置类）+ `scripts/kpa_theme_tweak.py`（主题类），都幂等、支持 `--revert`。
+
+| 现象 | 根因 | 修法 |
+|---|---|---|
+| DOS 左下角反复刷 `Save State Error` | 全局 `rewind_enable=true` + `savestate_auto_save=true`，而 DOSBox-pure 进来先停在 START MENU、游戏尚未运行 | 只在 `DOSBox-pure.cfg` 关这两项（不影响其它平台倒带） |
+| NDS 双屏被纵向拉长、画面被裁 | `melonds_screen_layout="Left/Right"` + `aspect_ratio_index="23"`，两屏并排后又被拉满屏 | 改 `Top/Bottom` + index **21** |
+| Atomiswave 背景满屏雪花噪点 | flycast 多线程渲染在 Atomiswave 下有 bug | `reicast_threaded_rendering="disabled"` |
+| Atomiswave 左下角 `Please upgrade to MAME romsets` | 核心对旧格式 romset 发 `SET_MESSAGE`，RA 以 OSD 显示数秒 | 每个 **per-game** cfg 写 `video_font_enable="false"` |
+| 顶部平台名太小、看不出当前平台 | 字号 24 且选中/未选同色 | delegate 字号 36、选中 `#ffffff` / 未选 `#6affffff` |
+| 退出游戏回到平台第一个而非刚才那个 | 2.96GB RAM 下天马被 LMK 回收，重启后只记 `Last Collection` | 记 `Last Game` + `restoreLastGame()` + 电池白名单 |
+
+### 10.1 主题平台条为什么"一直存在却看不见"
+
+`theme.qml` 里 `collectionNav` 写的是 `visible: false`，但它被 `OpacityMask` 的 `ShaderEffectSource` 当作纹理源渲染 —— **平台条其实一直在显示**，只是 `font.pixelSize: vpx(24)` 且所有项同为 `white`（选中项只换字体族，差别极小）。
+
+所以正确改法是只动 delegate 的 `font.pixelSize` 与 `color`（外加 `opacity: gameBar.active ? 1 : 0` → `1` 让它常显）。
+
+⚠️ **不要新造一个"平台名大标题"控件** —— 实测会与遮罩渲染出的那层重叠，出现双层错位文字。
+
+### 10.2 NDS 双屏比例怎么客观定
+
+不要靠肉眼。用截图数"亮像素外接矩形宽度"：
+
+```python
+# 960×640 截图，隔点采样后取非黑区域的 x/y 范围
+```
+
+实测同一标题画面：`aspect_ratio_index` 为 **21 / 22** 时亮像素宽约 **408px**（核心原始比例，左右留黑边，文字不变形）；为 **23 / 24** 时拉到 **918px**（满屏，纵向变形）。`Hybrid` 布局该核心不支持 —— 设了与 `Top/Bottom` 截图逐像素相同。
+
+### 10.3 一条走不通的路：DOS 自动跳过启动菜单
+
+想省掉每次进 DOS 都要在 `DOSBOX PURE START MENU` 里选程序，试过全部常规路线，**均无效**：
+
+1. `dosbox_pure_conf` 改 `"true"` / `"1"` / `"2"` / 完整 label 四种值 —— 都仍停在菜单；
+2. 在 `.dosz` 旁放同名 `.conf`（`[autoexec]` + `PLAY.BAT`） —— 无效；
+3. 用 Python 往 `.dosz` 内追加 `DOSBOX.CONF`（CRC 自检通过） —— 无效；
+4. 用 `input keyevent` 在菜单里按「→ Set Auto Start」 —— RA 收不到事件（HARD_RULES 23）；
+5. `sendevent` 直写 evdev —— `Permission denied`。
+
+**结论：这一步只能人手做。** 操作路径：进游戏 → 菜单出现 → 用 ↓ 移到 `PLAY.BAT` → 按 **→**（`Set Auto Start`）→ 该项出现标记，下次跳过菜单。想恢复菜单：在核心菜单选 Restart 时按住 L2/R2。
+
+15 个 DOS 包的启动项（已逐个解包确认，全部含 `PLAY.BAT`）：
+
+| 游戏 | 启动项 | 实际执行 |
+|---|---|---|
+| 仙剑奇侠传 | PLAY.BAT | PAL |
+| 轩辕剑外传-枫之舞 | PLAY.BAT | SWDA |
+| 高校魔影 | PLAY.BAT | g_map |
+| 大唐英雄传 / 明星志愿 / 毁灭战士2 | PLAY.BAT | — |
+| 炎龙骑士团 / 炎龙骑士团2 | PLAY.BAT | FD / FD2 |
+| 英雄传说3-白发魔女 | PLAY.BAT | ED3 |
+| 金庸群侠传 | play.bat | — |
+| 魔影哈雷 / 魔神战纪2 / 魔胎 / 鹿鼎记 / 龙骑士4 | PLAY.BAT | — |

@@ -59,7 +59,7 @@
 - 不带会读默认配置（中文变 `?`、菜单黑白），容易误判。GBA 启动命令禁止带 `--activity-clear-top`。
 
 **15. 禁止批量「更新已安装核心」**
-- 官方源约 17.5KB/s（手动下载卡在 14%）、nightly 非稳定版、与 216 个竖版 cfg / 遮罩 / CRT 配套有回归风险。
+- 官方源约 17.5KB/s（手动下载卡在 14%）、nightly 非稳定版、与 219 个竖版 cfg / 遮罩 / CRT 配套有回归风险。
 - ✅ 中断后的核查：看 `RetroArch/downloads/` 有无 zip 残留、`core_backups/` 有无 `.lcbk`、对 5 个核心冒烟；实测未覆盖任何核心。要更新单独点某一个。
 
 **16. 禁止给 GBA 加遮罩**
@@ -89,3 +89,25 @@
 **22. 清理前必须先出只读清单 + 影响说明并获用户确认**
 - ✅ 列出路径 / 大小 / 删除理由 / 回滚点；设备删除无废纸篓，分批 ≤10 项、每批校验。本机删除用可恢复方式（废纸篓或隔离区）。
 - 网络受限时不要假设 GitHub raw / bgm.tv / wikipedia / thegamesdb / screenscraper 可达；实测仅 `api.github.com` + gh-proxy + libretro thumbnails 可用（thumbnails 索引走 `git/trees?recursive=1`，contents 分页无效）。macOS adb 用 r34.0.5；大传输分块 55MB / 300 文件，`tar -T` 清单只放文件，校验用 `md5sum "路径"`（带双引号）。
+
+## F. RA 输入注入与配置层级（v2.0.1 新增）
+
+**23. 禁止假设 adb 能操作 RetroArch / 核心菜单**
+- ❌ 反复试 `input keyevent 19/20/21/22`、`input gamepad|joystick|dpad|keyboard keyevent`、`input tap`、`input motionevent` 去点 RA 菜单或 DOSBox-pure 启动菜单 —— **RA 完全不接收**。它直接 poll `/dev/input/event*`，绕过 InputManager，注入的事件根本不进它的输入队列（实测四种 source 注入后截图逐像素完全相同）。
+- ❌ `sendevent /dev/input/event3 ...` → `Permission denied`（shell 不在 `input` 组；`getevent` 同样读不到，无输出）。
+- ✅ 唯一有效的是 `input keyevent 4`(BACK)，走 Activity 回调能呼出 RA 菜单。
+- ✅ **天马(Pegasus) 是普通 Qt 应用、走 InputManager**，`input tap` / `input motionevent DOWN x y` + 0.3s + `UP x y` 对它有效。别把天马和 RA 的输入路径混为一谈 —— 这是本条最容易被误推的地方。
+- ✅ 结论：RA 核心选项、DOSBox-pure 启动菜单（`→ Set Auto Start`）这类操作**只能人手完成**。脚本负责把"该改哪个文件、改成什么值"准备好，但不要承诺自动点菜单。
+
+**24. 禁止用 per-playlist cfg 覆盖 OSD 开关**
+- ❌ 新建 `config/Flycast/ATOMOSWAVE.cfg` 写 `video_font_enable = "false"` —— 实测无效，弹窗照旧显示。
+- ✅ 写进该平台**每个 per-game** cfg：`config/Flycast/<游戏名>.cfg`，逐游戏生效（`kpa_gamefix.sh aw-osd` 批量处理）。
+- 层级实测：全局 → per-core → per-game 都生效；per-playlist 对 `video_font_enable` 不生效（但 `aspect_ratio_index` 这类显示键在 `NAOMI.cfg` 里是生效的，不能一概而论）。
+
+**25. 禁止在 `Roms/<平台>/` 放非 ROM 文件而不先收紧 extensions**
+- ❌ 直接往 `Roms/DOS/` 放 `游戏名.conf` 想让核心自动加载 —— metadata 没有 `extensions` 时 Pegasus 按目录扫全部文件，立刻多出幽灵条目。
+- ✅ 要么先给 metadata 加 `extensions: dosz`，要么把辅助文件放到 `Roms/` 之外。
+
+**26. 禁止用设备端 unzip 改 `.dosz`**
+- ❌ toybox `unzip` 遇中文条目名报 `Invalid entry name` / `couldn't open`，`unzip -l` 直接无输出。
+- ✅ 本机 Python：`zipfile.ZipFile(p, 'a')` 只追加新条目（不重压几百 MB），改完 `z.testzip()` 返回 `None` 才算成功；先 `cp` 一份 `.orig` 到设备同目录，验证通过再删。

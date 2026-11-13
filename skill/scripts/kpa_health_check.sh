@@ -88,4 +88,4 @@ EOS
   sh "rm -f /sdcard/kpa_check_dev.sh /sdcard/kpa_check_paths.txt" >/dev/null
   rm -f /tmp/kpa_check_dev.sh
 fi
-echo "提示：达标线为各项 ISSUES = 0、竖版 cfg 精确 216；改过 metadata 后必须清 dataCache.json 再重启。"
+echo "提示：达标线为各项 ISSUES = 0、竖版 cfg 精确 219；改过 metadata 后必须清 dataCache.json 再重启。"
