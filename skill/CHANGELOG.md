@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.2 — 2026-11-13
+
+### 修复
+
+- `scripts/kpa_gamefix.sh` 的 `--revert` 改为**值级还原**，不再依赖 `.bak` 文件。原因：同一份 cfg 会被多轮改动，`.bak` 很容易在某次「改完之后」才被创建，于是变成「已改版」备份 —— `cp` 回去等于没回滚（本轮实测在 Flycast 的 10 个 per-game cfg 上踩到了）。
+  现在的还原语义：DOS → `rewind_enable`/`savestate_auto_save` 回 `true`；NDS → 布局回 `Left/Right`、触屏回 `Mouse`、`aspect_ratio_index` 回 `23`；Flycast → `reicast_threaded_rendering` 回 `enabled`；Atomiswave → 删除 `video_font_enable` 行。
+- 设备上双向验证通过：回滚后 `video_font_enable` 计数归 0、`rewind_enable=true`；再 `--apply` 恢复 16 处写入，值回到 `false`。
+
 ## 2.0.1 — 2026-11-13
 
 按实机反馈修六类体验问题，并推翻一处会误导排查的错误认知。

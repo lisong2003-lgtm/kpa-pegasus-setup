@@ -2,7 +2,7 @@
 name: kpa-pegasus-setup
 slug: kpa-pegasus-setup
 displayName: "KPA掌机天马安装与优化助手"
-version: 2.0.1
+version: 2.0.2
 platforms: [macos, linux, windows]
 author: lis
 description: KONKR Pocket ADVANCE（KPA，Android 12 / 960×640）掌机的 Pegasus 天马前端 + RetroArch + PPSSPP 全流程安装、排障与优化。覆盖 metadata / dataCache 缓存、ANDROID 移植游戏收录、竖版游戏方向映射、libretro 核心安装（含 MSX 本地镜像法）、BIOS / 遮罩 / 着色器 / 滤镜、.nomedia 图库隐藏、详情页增强、主题平台条增强、双屏布局、全库健康校验与可逆清理。含 7 步幂等脚本、9 个专项工具与 26 条硬性禁令。触发词：KPA、KONKR Pocket ADVANCE、AYANEO 掌机、天马、Pegasus、RetroArch、竖版方向键反了、核心装不上、掌机优化、模拟器安装、NDS 双屏变形、退出游戏回不到原位、ATOMOSWAVE 雪花、DOS 弹窗。
@@ -127,6 +127,7 @@ bash scripts/run_all.sh     # step1..step7，幂等，可重跑
 
 ## 版本与来源
 
+- **v2.0.2（2026-11-13）**：`kpa_gamefix.sh` 的回滚改为**值级还原**。原因：同一份 cfg 会被多轮改动，`.bak` 很容易在某次"改完之后"才创建，变成"已改版"备份 —— `cp` 回去等于没回滚（本轮实测踩到）。现按原值还原并在设备上双向验证（回滚删行/改回 `true`，再应用恢 16 处写入）。其余同 2.0.1。
 - **v2.0.1（2026-11-13）**：按实机反馈修 6 类体验问题 —— ①主题平台名字号 24→36 且选中高亮 ②退出后恢复上次游戏（`Last Game` + 白名单）③NDS 双屏改上下排列 + 原始比例 ④Flycast 关多线程渲染修雪花 ⑤DOS 关倒带修存档弹窗 ⑥Atomiswave 逐游戏关 OSD 修 MAME romset 提示。新增 `kpa_theme_tweak.py` 与 `kpa_gamefix.sh`（均幂等、`--revert` 可回滚）。**修正一个错误认知**：adb 注入的事件 RA 全部不接收（`input` 各源无效、`sendevent` 无权限），只有 BACK 有效。新增禁令 12–15。隔离坏 ROM `VR运动会.bin`，健康基线 3770→3769。
 - **v2.0.0（2026-11-13）**：纠正竖版方向映射、ANDROID `.app` 占位写法、机型名；新增 MSX 本地镜像、`.nomedia`、详情页增强、健康校验、清理盘点专项脚本；补 22 条硬性禁令、全流程复盘与遗留项清单。
 - 发布：SkillHub `@user_43faedd6/kpa-pegasus-setup` · ClawHub `kpa-pegasus-setup` · GitHub `lisong2003-lgtm/kpa-pegasus-setup`
