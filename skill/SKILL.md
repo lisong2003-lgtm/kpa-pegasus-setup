@@ -2,7 +2,7 @@
 name: kpa-pegasus-setup
 slug: kpa-pegasus-setup
 displayName: "KPA掌机天马安装与优化助手"
-version: 2.3.1
+version: 2.3.2
 platforms: [macos, linux, windows]
 author: lis
 description: KPA 掌机天马/RA/PPSSPP 安装与排障优化；不含 ROM/BIOS。
