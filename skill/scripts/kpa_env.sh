@@ -6,7 +6,7 @@ KPA_SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export KPA_SKILL_DIR
 
 find_adb() {
-  if [ -n "$KPA_ADB" ] && [ -x "$KPA_ADB" ]; then return; fi
+  if [ -n "${KPA_ADB:-}" ] && [ -x "${KPA_ADB:-}" ]; then return; fi
   for c in "$(which adb)" "$HOME/WorkBuddy"/*/tools/platform-tools/adb "$HOME/.workbuddy/tools/platform-tools/adb" "/opt/homebrew/bin/adb"; do
     if [ -n "$c" ] && [ -x "$c" ]; then export KPA_ADB="$c"; return; fi
   done

@@ -1,25 +1,26 @@
 collection: PSP
 sort-by: 10
 shortname: psp
-launch: am start --user 0 -a android.intent.action.VIEW -d "file://{file.path}" -n org.ppsspp.ppsspp/.PpssppActivity
+extensions: app
+launch: am start --user 0 -n org.ppsspp.ppsspp/.PpssppActivity
 
 game: 侠盗猎车 - 罪恶都市传奇
-file: 侠盗猎车 - 罪恶都市传奇.iso
-launch: am start --user 0 -a android.intent.action.VIEW -d "file:///storage/emulated/0/Android/data/org.ppsspp.ppsspp/files/侠盗猎车 - 罪恶都市传奇.iso" -n org.ppsspp.ppsspp/.PpssppActivity
+file: gta_vc.app
+launch: am start --user 0 -n org.ppsspp.ppsspp/.PpssppActivity --es "org.ppsspp.ppsspp.Shortcuts" "/storage/emulated/0/Android/data/org.ppsspp.ppsspp/files/侠盗猎车 - 罪恶都市传奇.iso"
 assets.box_front: Imgs/侠盗猎车 - 罪恶都市传奇.png
-description: 《侠盗猎车 - 罪恶都市传奇》，PSP 平台。
+description: GTA 系列 PSP 作品，罪恶都市前传剧情，开放世界与载具抢夺。
 game: 实况足球 2009
-file: 实况足球 2009.cso
-launch: am start --user 0 -a android.intent.action.VIEW -d "file:///storage/emulated/0/Android/data/org.ppsspp.ppsspp/files/实况足球 2009.cso" -n org.ppsspp.ppsspp/.PpssppActivity
+file: pes2009.app
+launch: am start --user 0 -n org.ppsspp.ppsspp/.PpssppActivity --es "org.ppsspp.ppsspp.Shortcuts" "/storage/emulated/0/Android/data/org.ppsspp.ppsspp/files/实况足球 2009.cso"
 assets.box_front: Imgs/实况足球 2009.png
-description: 《实况足球 2009》，PSP 平台。
+description: KONAMI 足球模拟，PSP 便携版支持单机对战。
 game: 山脊赛车
-file: 山脊赛车.cso
-launch: am start --user 0 -a android.intent.action.VIEW -d "file:///storage/emulated/0/Android/data/org.ppsspp.ppsspp/files/山脊赛车.cso" -n org.ppsspp.ppsspp/.PpssppActivity
+file: ridge_racer.app
+launch: am start --user 0 -n org.ppsspp.ppsspp/.PpssppActivity --es "org.ppsspp.ppsspp.Shortcuts" "/storage/emulated/0/Android/data/org.ppsspp.ppsspp/files/山脊赛车.cso"
 assets.box_front: Imgs/山脊赛车.png
-description: 《山脊赛车》，PSP 平台。
+description: NAMCO 竞速游戏，漂移手感与电子配乐是招牌。
 game: 战神-奥林匹斯之链
-file: 战神-奥林匹斯之链.iso
-launch: am start --user 0 -a android.intent.action.VIEW -d "file:///storage/emulated/0/Android/data/org.ppsspp.ppsspp/files/战神-奥林匹斯之链.iso" -n org.ppsspp.ppsspp/.PpssppActivity
+file: gow_chains.app
+launch: am start --user 0 -n org.ppsspp.ppsspp/.PpssppActivity --es "org.ppsspp.ppsspp.Shortcuts" "/storage/emulated/0/Android/data/org.ppsspp.ppsspp/files/战神-奥林匹斯之链.iso"
 assets.box_front: Imgs/战神-奥林匹斯之链.png
-description: 《战神-奥林匹斯之链》，PSP 平台。
+description: 战神系列 PSP 前传，奎托斯的希腊神话冒险，画面接近主机水准。

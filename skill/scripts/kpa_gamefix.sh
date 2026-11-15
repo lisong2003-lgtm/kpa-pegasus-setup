@@ -1,11 +1,12 @@
 #!/bin/bash
 # KPA 实机体验问题修复（v2.0.1 新增）
 #
-# 修四类实机反馈问题，全部只改配置、可回滚：
+# 修五类实机反馈问题，全部只改配置、可回滚：
 #   dos      DOSBox-pure 关闭倒带与自动存档  -> 消除左下角 "Save State Error" 弹窗
 #   nds      melonDS 双屏改上下 + 原始宽高比  -> 修两屏并排被拉伸变形
 #   flycast  关闭多线程渲染                  -> 修 Atomiswave 背景满屏雪花噪点
 #   aw-osd   逐个 Atomiswave 游戏关闭 OSD 文字 -> 消除 "Please upgrade to MAME romsets" 提示
+#   p2       断掉 2P 与 1P 共用同一手柄      -> 修"一个手柄同时控制两个角色"
 #
 # 用法：
 #   bash scripts/kpa_gamefix.sh all              # 默认 dry-run，只打印将要做的改动
@@ -23,7 +24,8 @@ require_device >/dev/null 2>&1 || { echo "ERROR: 未检测到 KPA 设备"; exit 
 
 ACTION="${1:-all}"
 MODE="${2:-}"
-CFG_INT="$INT/Android/data/$RA_PKG/files/retroarch.cfg"
+CFG_INT="$INT/Android/data/$RA_PKG/files/retroarch.cfg"   # 天马 launch 传的 CONFIGFILE（实际生效）
+CFG_RA2="$INT/RetroArch/retroarch.cfg"                      # 直接从 RA 图标启动时读的那份，需同步
 RA_CONFIG="$INT/RetroArch/config"
 DOS_CFG="$RA_CONFIG/DOSBox-pure/DOSBox-pure.cfg"
 NDS_OPT="$RA_CONFIG/melonDS/melonDS.opt"
@@ -110,6 +112,29 @@ fix_flycast() {
   set_kv "$FLY_OPT" reicast_threaded_rendering "disabled"
 }
 
+fix_p2() {
+  say "[p2] 断开 2P 与 1P 共用同一手柄"
+  say "      根因：本机 P1、P2 的 joypad_index 都是 0，且 P2 的 analog_dpad_mode=3。"
+  say "      analog_dpad_mode 不依赖按键绑定，直接把左摇杆换算成该玩家方向键 —— "
+  say "      于是推摇杆时 1P、2P 同时收到方向，出现\"一个手柄控制两个角色\"\"主副角色都进入\"。"
+  say "      只有没写 remap 的核心会踩到：fbalpha2012_cps1/2/3/neogeo、mame2003_plus 等"
+  say "      （FBNeo / MAME / Flycast 自带 remap 里已把 P2 的 analog_dpad_mode 固定为 0，所以它们正常）"
+  local f
+  for f in "$CFG_INT" "$CFG_RA2"; do
+    if [ "$REVERT" = 1 ]; then
+      revert_kv "$f" input_player2_analog_dpad_mode "3"
+      revert_kv "$f" input_player2_joypad_index "0"
+      revert_kv "$f" input_player3_joypad_index "1"
+    else
+      set_kv "$f" input_player2_analog_dpad_mode "0"
+      set_kv "$f" input_player2_joypad_index "1"
+      set_kv "$f" input_player3_joypad_index "2"
+    fi
+  done
+  say "      说明：P2 改到 joypad index 1（当前不存在第二个手柄 => 2P 收不到任何输入）；"
+  say "            P3 顺移到 2，避免以后插小手柄时 P2/P3 抢同一索引；P1 的 analog_dpad_mode 保持 3 不变。"
+}
+
 fix_aw_osd() {
   say "[aw-osd] Atomiswave：逐游戏关闭 OSD 文字"
   say "      根因：flycast 对旧 MAME romset 发 SET_MESSAGE 提示，RA 以 OSD 显示，约数秒不散。"
@@ -141,8 +166,9 @@ case "$ACTION" in
   nds)     fix_nds ;;
   flycast) fix_flycast ;;
   aw-osd)  fix_aw_osd ;;
-  all)     fix_dos; echo; fix_nds; echo; fix_flycast; echo; fix_aw_osd ;;
-  *)       echo "用法: $0 <dos|nds|flycast|aw-osd|all> [--apply|--revert]"; exit 2 ;;
+  p2)      fix_p2 ;;
+  all)     fix_dos; echo; fix_nds; echo; fix_flycast; echo; fix_aw_osd; echo; fix_p2 ;;
+  *)       echo "用法: $0 <dos|nds|flycast|aw-osd|p2|all> [--apply|--revert]"; exit 2 ;;
 esac
 
 echo

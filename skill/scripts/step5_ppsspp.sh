@@ -16,12 +16,14 @@ else
   echo "OK    ppsspp.ini 已部署（满屏拉伸 + 关闭虚拟键）"
 fi
 
-# 5.2 PSP ROM 拷贝（TF 卡 ROM 与 PPSSPP 目录不互通，是 Android 分区存储限制，必须双份）
+# 5.2 PSP ROM 拷贝（TF 卡 ROM 与 PPSSPP 目录不互通，是 Android 分区存储限制）
+# 注意：内置 files/ 那份才是游戏本体；TF 卡副本只供天马 file: 索引，
+#       去重时可用 .app 占位替代（见 HARD_RULES 38/40、PLAYBOOK §12.8 / §13）
 if sh "test -f $TF/Roms/PSP/metadata.pegasus.txt" | grep -q ""; then :; fi
-sh "ls $TF/Roms/PSP/ 2>/dev/null | grep -iE '\\.(iso|cso|pbp)$'" > /tmp/kpa_psp_roms.txt
+sh "ls $TF/Roms/PSP/ 2>/dev/null | grep -iE '\.(iso|cso|pbp)$'" > /tmp/kpa_psp_roms.txt
 n=$(wc -l < /tmp/kpa_psp_roms.txt | tr -d ' ')
 if [ "$n" = "0" ]; then
-  echo "SKIP  TF 卡没有 PSP ROM"
+  echo "SKIP  TF 卡没有 PSP ROM（可能已用 .app 占位去重）"
 else
   copied=0
   while IFS= read -r rom; do
@@ -35,37 +37,48 @@ else
       copied=$((copied+1))
     fi
   done < /tmp/kpa_psp_roms.txt
-  echo "OK    PSP ROM 双份部署完成（本次新拷 $copied 个；双份是必须的，勿删除）"
+  echo "OK    PSP ROM 已从 TF 卡拷入内置 files/（本次新拷 $copied 个）"
 fi
 rm -f /tmp/kpa_psp_roms.txt
 
-# 5.3 PSP metadata launch 行（逐游戏指向 PPSSPP 拷贝路径）
-cat > /tmp/kpa_step5_device.sh <<'EOS'
-#!/system/bin/sh
-TF="${1:-/storage/6AF3-384F}"
-m="$TF/Roms/PSP/metadata.pegasus.txt"
-files="/storage/emulated/0/Android/data/org.ppsspp.ppsspp/files"
-[ -f "$m" ] || exit 0
-grep -q '^launch:' "$m" && exit 0
-cp "$m" "$m.bakKPA3"
-awk -v files="$files" -v tf="$TF" '
-  /^file: / { fname=$2 }
-  {
-    if ($1=="file:" && fname!="") {
-      if (system("test -f \"" files "/" fname "\"")==0)
-        print "launch: am start --user 0 -a android.intent.action.VIEW -d \"file://" files "/" fname "\" -n org.ppsspp.ppsspp/.PpssppActivity";
-      else
-        print "launch: am start --user 0 -a android.intent.action.VIEW -d \"file://" tf "/Roms/PSP/" fname "\" -n org.ppsspp.ppsspp/.PpssppActivity";
-      fname=""
-      next
-    }
-    if ($1=="launch:") next
-    print
-  }' "$m.bakKPA3" > "$m.tmp" && mv "$m.tmp" "$m"
-echo "RESULT psp_launch_added=1"
-EOS
-"$ADB" push /tmp/kpa_step5_device.sh /sdcard/kpa_step5_device.sh >/dev/null
-sh "sh /sdcard/kpa_step5_device.sh $TF"
-sh "rm -f /sdcard/kpa_step5_device.sh" >/dev/null
-rm -f /tmp/kpa_step5_device.sh
+# 5.3 PSP metadata launch：⛔ 禁止 -d "file://..."（天马构造 Intent 会触发 FileUriExposedException）
+# 只就地改 launch 行，不整份覆盖（保留用户自定义简介 / 封面）；幂等，可重复运行修复旧配置。
+META=/tmp/kpa_psp_meta.txt
+"$ADB" pull "$TF/Roms/PSP/metadata.pegasus.txt" "$META" >/dev/null 2>&1 || { echo "SKIP  PSP metadata 不存在"; echo "step5 done"; exit 0; }
+cp "$META" "$META.bak"
+python3 - "$META" <<'PY'
+import re, sys
+p = sys.argv[1]
+s = open(p, encoding='utf-8').read()
+files = '/storage/emulated/0/Android/data/org.ppsspp.ppsspp/files'
+pat = re.compile(r'launch: am start --user 0 -a android\.intent\.action\.VIEW -d "file://([^"]+)" -n org\.ppsspp\.ppsspp/\.PpssppActivity')
+def conv(m):
+    path = m.group(1)
+    if '/Roms/PSP/' in path:            # 旧版曾把 launch 指向 TF 卡，PPSSPP 读不到
+        path = files + '/' + path.rsplit('/', 1)[-1]
+    return ('launch: am start --user 0 -n org.ppsspp.ppsspp/.PpssppActivity '
+            '--es "org.ppsspp.ppsspp.Shortcuts" "' + path + '"')
+s, n = pat.subn(conv, s)
+# collection 级兜底：去掉 file:// URI，避免 {file.path} 再触发异常
+s = s.replace('launch: am start --user 0 -a android.intent.action.VIEW -d "file://{file.path}" -n org.ppsspp.ppsspp/.PpssppActivity',
+              'launch: am start --user 0 -n org.ppsspp.ppsspp/.PpssppActivity')
+# 新装机器：没有 per-game launch 时按真实 ROM 的 file: 生成 extra 版（.app 占位不生成）
+if n == 0 and '--es "org.ppsspp.ppsspp.Shortcuts"' not in s:
+    out = []
+    for line in s.splitlines(True):
+        out.append(line)
+        if line.startswith('file: '):
+            fname = line[6:].strip()
+            if fname.lower().endswith(('.iso', '.cso', '.pbp')):
+                out.append('launch: am start --user 0 -n org.ppsspp.ppsspp/.PpssppActivity '
+                           '--es "org.ppsspp.ppsspp.Shortcuts" "' + files + '/' + fname + '"\n')
+    s = ''.join(out)
+    n = 1
+open(p, 'w', encoding='utf-8').write(s)
+print('RESULT psp_launch_fixed=%d file_uri_left=%d' % (n, s.count('file://')))
+PY
+"$ADB" push "$META" "$TF/Roms/PSP/metadata.pegasus.txt" >/dev/null
+rm -f "$META" "$META.bak"
+sh "rm -f /sdcard/pegasus-frontend/dataCache.json"
+echo "OK    PSP launch 已统一为 shortcut extra；请重启天马并从前端逐条点击验证（PLAYBOOK §13）"
 echo "step5 done"
