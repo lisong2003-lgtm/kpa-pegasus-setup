@@ -1,7 +1,7 @@
 # 一键安装 · 从零到可验收
 
 > 这份文档只讲**验证成功、可复用**的最短路径。整轮踩坑复盘见 `references/OPTIMIZATION_JOURNEY.md`，
-> 完整 57 条禁令见 `references/HARD_RULES.md`，分项实操见 `references/PLAYBOOK.md`。
+> 完整 58 条禁令见 `references/HARD_RULES.md`，分项实操见 `references/PLAYBOOK.md`。
 
 ![KPA 一键安装 7 步流程](https://skillhub-1388575217.cos.accelerate.myqcloud.com/skill-comments/uploads/634669/4224e8230a6941eaa2aa7eb8bd955926.png)
 
@@ -82,7 +82,7 @@ bash ~/.workbuddy/skills/kpa-pegasus-setup/scripts/kpa_oneclick.sh
 
 ## 7. 不走弯路：最容易踩的 10 条
 
-这 10 条来自真实故障，其余 47 条见 `references/HARD_RULES.md`。
+这 10 条来自真实故障，其余 45 条见 `references/HARD_RULES.md`。
 
 1. **改 metadata / 新增目录后必须删 `dataCache.json` 并重启天马**，否则前端一直显示旧缓存（脚本阶段 3 已自动做）。
 2. **禁止 `am force-stop com.ayaneo.home`** —— 会杀掉系统按键服务，只能关机重启恢复。
@@ -97,16 +97,16 @@ bash ~/.workbuddy/skills/kpa-pegasus-setup/scripts/kpa_oneclick.sh
 
 ## 8. 优化流程总结（本包是怎么来的）
 
-整轮工程按「先通用、后特例；先只读、后写入；先单点、后推广」推进，六个阶段（下表 ①② 的 36 平台是资产模板口径，实机基线为 35 平台 / 3706 条）：
+整轮工程按「先通用、后特例；先只读、后写入；先单点、后推广」推进，六个阶段：
 
 | 阶段 | 做了什么 | 沉淀位置 |
 |---|---|---|
-| ① 基线搭建 | 36 平台 metadata / 27 核心 / 主题 / 双屏 / 遮罩 / 竖版方向库 | `scripts/step1~7`、`references/PROCESS_REVIEW.md` |
+| ① 基线搭建 | 36 平台 metadata / 27 核心 / 主题 / 双屏 / 遮罩 / 竖版方向库 | `scripts/step1~7`、`references/OPTIMIZATION_JOURNEY.md` §5.1 |
 | ② 数据治理 | 简介回填、封面补齐、`.nomedia`、重复 ROM 与冗余包分级清理、playlist 死引用 | `references/PLAYBOOK.md` §1–§12 |
 | ③ 体验优化 | 热门 10 款置顶、MSX / PICO 遮罩、PSP 退出组合、CPS1 / CPS3 键位 | `references/PLAYBOOK.md` §13–§17 |
 | ④ 疑难攻坚 | DOS 免选 exe 直启、`.dosz` 崩溃二分定位、ZIP 伪装 ROM 解包、土星 CHD 引导区判定 | `references/PLAYBOOK.md` §18 |
 | ⑤ 二次反馈 | 更正「按尺寸判占位封面」误判、N64 十字键绑定层、汉化版长片头定性、坏 CHD 删除 | `references/PLAYBOOK.md` §19、`OPTIMIZATION_JOURNEY.md` §15 |
-| ⑥ 沉淀 | 57 条禁令 + 一键安装通道 + 蓝标系列图示 + 本机 / 设备双回滚点 | 本文件、`scripts/kpa_oneclick.sh`、`assets/blueprints/` |
+| ⑥ 沉淀 | 58 条禁令 + 一键安装通道 + 蓝标系列图示 + 本机 / 设备双回滚点 | 本文件、`scripts/kpa_oneclick.sh`、`assets/blueprints/` |
 
 **贯穿全程的三条方法论**：
 

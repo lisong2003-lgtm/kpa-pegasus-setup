@@ -435,15 +435,15 @@ $ADB shell "grep -n 'console.log' /sdcard/pegasus-frontend/themes/kpa-shelf/them
 ```bash
 df -h /
 du -sh ~/WorkBuddy/*/work ~/WorkBuddy/*/shots ~/WorkBuddy/*/backup
-for d in ~/.Trash ~/Library/Caches ~/Library/Logs ~/Downloads ~/.workbuddy "$CODEX_HOME"; do
+for d in ~/.Trash ~/Library/Caches ~/Library/Logs ~/Downloads $HOME/.workbuddy $HOME/.codex; do
   [ -e "$d" ] && printf "%8s  %s\n" "$(du -sh "$d" | awk '{print $1}')" "$d"
 done
-du -sk ~/.workbuddy/* | sort -nr | head -15
-du -sk "$CODEX_HOME"/*  | sort -nr | head -15
-find ~/.workbuddy/logs -type f -mtime +7 | wc -l        # 7 天前日志数
+du -sk $HOME/.workbuddy/* | sort -nr | head -15
+du -sk $HOME/.codex/*      | sort -nr | head -15
+find $HOME/.workbuddy/logs -type f -mtime +7 | wc -l        # 7 天前日志数
 ```
 
-`~/.workbuddy/logs/sandbox/` 与 `traces/` 是日志大户，按日期分目录，适合「保留最近 7 天」策略；`~/.workbuddy/workspace/sessions/<sessionId>/` 是会话工作区副本，与 `projects/*.jsonl` 的性质不同但也**不要**随手删 —— 先确认该 session 是否还在用。
+`$HOME/.workbuddy/logs/sandbox/` 与 `traces/` 是日志大户，按日期分目录，适合「保留最近 7 天」策略；`$HOME/.workbuddy/workspace/sessions/<sessionId>/` 是会话工作区副本，与 `projects/*.jsonl` 的性质不同但也**不要**随手删 —— 先确认该 session 是否还在用。
 
 ### 12.4 会「持续制造垃圾」的三个开关
 
@@ -495,8 +495,8 @@ $ADB shell "grep -c '^game:' $M"     # 6 -> 5
 | TF 卡 13 个 `metadata.*.bak*` + RA config 30 个 `.bak*` | <1M | 🟢 保留最近一轮 |
 | `.Trashes/501/` | 空目录 256K | 🟢 |
 | PPSSPP ISO/CSO 4.3G、pocketmuseum 2.0G、RA system/overlays/cheats 553M | — | 🔴 禁删 |
-| 本机工作区 / `~/.workbuddy` / `$CODEX_HOME` / `~/Library/Caches` / `~/.Trash` | 1.0G / 7.0G / 1.6G / 316M / 1.3M(22 项) | 分级见 12.3 |
-| 本机 `~/.workbuddy/logs` 788M（sandbox 515M、435 个文件、>7 天 155 个） | — | 🟢 按日期清 |
+| 本机工作区 / `$HOME/.workbuddy` / `$HOME/.codex` / `~/Library/Caches` / `~/.Trash` | 1.0G / 7.0G / 1.6G / 316M / 1.3M(22 项) | 分级见 12.3 |
+| 本机 `$HOME/.workbuddy/logs` 788M（sandbox 515M、435 个文件、>7 天 155 个） | — | 🟢 按日期清 |
 | 本机 460G 盘剩 347G | — | 无需为腾空间冒险 |
 
 > **2026-11-14 16:40 执行状态更新**：设备侧 🟢 主项已按 §12.6 分批清理（4 批，每批 ≤10 项并逐批校验），`/data/local/tmp` 606M → 12K，内置 7.1G(67%) → 7.7G(64%)，`Data-Free` 7,448,064K → 8,164,392K。仍未动：43 个 `.bak`（<1M 且是配置回滚点，收益远小于风险）、应用缓存 88.5M、全部 🟡/🔴、本机个人目录项。执行明细见工作区 `work/cleanup/kpa-cleanup-audit-20261114.txt`。
@@ -752,7 +752,7 @@ def to_fs(p):
 am force-stop com.retroarch.aarch64     # 若用户正在玩则不要停，改为退出后复核
 cp <5 个 .lpl> /sdcard/backup/playlist-clean-20261114/
 # 本机过滤 items，保留顶层键与键顺序，json.dumps(ensure_ascii=False, indent=2)
-rm -f <目标 .lpl> && adb push <清理后的本地文件> <目标>     # ⛔ 先删再推，避免短文件尾部残片
+rm -f <目标 .lpl> && adb push <已删条目的 LPL> <目标>     # ⛔ 先删再推，避免短文件尾部残片
 adb pull <目标> /tmp/check && md5 比对
 # 再全库复算：21 个 playlist / 2,454 条 / DEAD=0
 ```
@@ -957,32 +957,3 @@ bash scripts/kpa_oneclick.sh             # ② 备份 → 7 步 → 清缓存 �
 ### 20.4 发布
 
 先 `--dry-run` 预检 → ① 用 `/api/v1/skills/<slug>/comments/images` 把 6 张图传 COS 拿绝对 URL → ② 发布目录**排除所有 `.png`**（否则 400 `不允许的文件类型`）→ ③ 手工构造 multipart 调 `POST /api/v1/community/skills/publish`，payload 里带 `iconUrl`（CLI 未实现该字段）→ ④ 回查 `skill.iconUrl` / `latestVersion.version` / `changelog`。详见 `HARD_RULES` 57。
-
-## 21. 关键技术事实速查（2026-11-15 从 SKILL.md 外移）
-
-> 本节为原 `SKILL.md` 常驻速查卡的逐字外移，是「先看结论、再翻细节」的索引；
-> 细节与命令分别在 §3（竖版）、§4（MSX）、§10（体验修复）、§11（主题）、§12（缓存/体检）、§13–§14（PPSSPP）、§15–§17（按键）、§18–§19（疑难）。
-
-- **街机横版按键（v2.2.3 收尾）**：竖版专用映射 `a=109 / b=108 / start=97 / select=96` 被写进 **4 个核心级 cfg**（`FB Alpha 2012 CPS-1 / CPS-2 / NeoGeo` + `FinalBurn Neo`），横版继承后按键错位；4/4 现已统一为全局标准 `a=96 / b=97 / start=108 / select=109`。⛔ 全设备 `a=109` 有 226 个文件，绝大多数是**竖版 per-game cfg 的正确设计**；`FinalBurn Neo/FBNEO {ACT,STG,FLY,ETC} V.cfg` 是竖版分类配置（`aspect_ratio=24`），也**不是污染**。⛔ 只改「文件名==目录名」的核心级 4 行，别动 per-game / 分类 cfg、别新建 `.rmp`。⚠️ 4 个平台仍需用户实体键确认（adb 注入按键 RA 全不接收）。详见 §15 / `HARD_RULES` 42。
-- **CPS3 六键格斗按键（v2.2.4，与上面完全不同源）**：CPS3 走 `fbalpha2012_cps3`，核心级 cfg **没有按键行**（继承全局，本来就对），也无 per-game cfg/remap，⛔ 别按禁令 42 补写按键。根因是核心选项文件 `config/FB Alpha 2012 CPS-3/FB Alpha 2012 CPS-3.opt` 的 `controls_p1/p2 = "gamepad"`：它把 6 键打散成 `Y/X/L + B/A/R`，机身 A/B 出的是脚；改成 **`arcade`** 后为 `A/B/X/Y/L/R`（标准三拳三脚，96/97/99/100/102/103 全局都有绑定）。⛔ `lr_controls` 必须保持 `normal`（`remap to R1/R2` 会落到未绑定的 104/105）。只改 `.opt` 两行、备份 + md5 校验；冷启动 `sfiii3` 证明核心接受该值且配置未被写回，**实体键手感仍需用户实测**。定稿 `assets/ra-cps3/CPS-3.opt`，详见 §17 / `HARD_RULES` 44。
-- **竖版方向最终值（219 个 per-game cfg 统一；早期文档写 216 是少算 3 个 FBNeo 系）**：`up=h0right / down=h0left / left=h0up / right=h0down`；按键 `a=109 / b=108 / start=97 / select=96`。厂商原版基线是反的（`up=h0left …`），**不要照抄**。MAME 2003-Plus（MAME/VARCADE）`video_rotation="1"`；FBAlpha/FBNeo 系（FBNEO/CPS1/2/3/NEOGEO）`video_rotation="3"`；两者最终呈现一致（文字顶部朝右、满屏横躺）。竖版判定用 `assets/data/mame_orient.json`（6055 条）+ 4 个补漏 `gekiridn / tengaij / p47mus / schmeisr`。
-- **ANDROID 集合**：`file:` 必须是**真实存在的文件**。写 `<包名>/<Activity>` 会被 Pegasus 丢弃，表现为整个集合不显示。正确写法：`extensions: app` + `file: <游戏名>.app`（占位空文件）+ 每个游戏一条 `launch: am start --user 0 -n <包名>/<Activity>`。封面用 `adb exec-out screencap` 截启动画面。
-- **核心安装**：RA APK 内置约 83 核心，覆盖全部平台唯缺 MSX。MSX 官方源慢（约 17.5KB/s）会卡在 14%；本地镜像法：把已有 `.so` 打成 zip + 造 `.index-extended`（每行 `日期 哈希 文件名`，**不是 `.index`**）+ 临时改**两份** `retroarch.cfg` 的 `core_updater_buildbot_cores_url` 指向 Mac 的 HTTP 服务，让 RA 自己下载解压到私有 cores 目录；装完改回官方源并关服务。MSX 冷启动约 15–18 秒，不是黑屏。
-- **输入注入的真实边界（2026-11-13 二次实测修正）**：RA **完全不接收** adb 注入的事件 —— `input keyevent 19/20/21/22`、`input gamepad|joystick|dpad|keyboard keyevent`、`input tap` 对 RA 全部无效（RA 直接 poll evdev 设备节点，绕过 InputManager），`sendevent` 直接写 evdev 节点报 `Permission denied`（shell 不在 input 组，`getevent` 也读不到）。**唯一有效的是 BACK(4)**，走 Activity 回调能呼出 RA 菜单。天马(Pegasus) 是普通 Qt 应用、走 InputManager，`input tap` / `input motionevent DOWN x y` + 0.3s + `UP x y` 对它有效。**因此 RA 核心选项、DOSBox-pure 启动菜单这类操作只能人手完成。**
-- **实机体验类配置（v2.0.1 新增，逐条实机验证）**：
-  - **主题平台条**：`collectionNav` 虽写了 `visible: false`，但被 `OpacityMask` 的 `ShaderEffectSource` 渲染出来 —— **平台条其实一直显示**，只是字号 24 且同色看不出当前平台。改 delegate 的 `font.pixelSize`（24→36）与 `color`（选中 `#ffffff` / 未选中 `#6affffff`）即可，**不需要新造标题控件**（新造会与遮罩重复渲染成双层字）。
-  - **退出游戏回不到原位**：任务栈正常（RA 独立 task、天马在下层），真因是 **RAM 仅 2.96GB，天马(196MB) 被 LMK 回收**，重启后只记得 `Last Collection`、不记得具体游戏。修法：`theme.qml` 记 `Last Game` + `restoreLastGame()` 定位回列表；并把天马/RA 加白名单 `cmd deviceidle whitelist +<pkg>`。
-  - **NDS 双屏**：`melonds_screen_layout="Left/Right"` + `aspect_ratio_index="23"` 会把两屏并排后再拉满屏 → 纵向变形、画面被裁。改 `Top/Bottom` + index **21**（实测 21/22 才是核心原始比例，亮像素宽约 408px；23/24 会拉到 918px）。`Hybrid` 该核心不支持（设了与 Top/Bottom 画面逐像素相同）。
-  - **Flycast 雪花噪点**：`reicast_threaded_rendering="enabled"` 会让 Atomiswave 背景满屏随机雪花，改 `disabled` 即净（GGX 对比截图已验证）。
-  - **DOS 存档弹窗**：全局 `rewind_enable=true` + `savestate_auto_save=true`，而 DOSBox-pure 进来先停在 `DOSBOX PURE START MENU`、游戏尚未运行 → 存状态必然失败，左下角刷 `Save State Error: Unable to save state while game is not running.`。只在 `DOSBox-pure.cfg` 关这两项，不影响其它平台倒带。
-  - **Atomiswave 的 MAME romset 提示**：flycast 对旧格式 romset 发 `SET_MESSAGE`，RA 以 OSD 显示数秒不散。`video_font_enable="false"` 可关，但**必须写进 per-game cfg**（per-playlist 的 `ATOMOSWAVE.cfg` 实测不生效）；副作用是该平台不再显示存档/快进/截图提示。
-- **metadata / 详情页**：`description:` 支持，多行值后续行缩进两空格；详情页 `GameDetails.qml` 原版未选中 `opacity=0.5`、简介 `vpx(18)` + `elide` 截断，观感弱。增强版在 `assets/golden/GameDetails.improved.qml.txt`，原版回滚点 `GameDetails.before.qml.txt`。空壳模板句约 1142 条，用 `bangumi_desc.py` 升级。
-- **主题重载机制（决定「退出回原界面」怎么做）**：Pegasus 官方文档明确 —— 游戏成功启动后前端会 minimize 并把主题 **整个重新加载**，返回时 QML 是全新实例，`Component.onCompleted` 重跑。所以「回到上次选的游戏」**只能靠 `api.memory`**，不能指望界面状态残留。正确做法：选中变化后延迟写 `Shelf Game`（游戏名）+ `Shelf Collection`（平台下标）；启动时先按平台下标定位，找不到再全库扫游戏名兜底。实测只写游戏名也能定位（`{"Shelf Game":"幽灵诡计"}` → 自动切到 NDS 第 30 个）。**不要用 `currentIndex` 直接设值**：ListView/GridView 在 `Component.onCompleted` 阶段设了会被模型初始化覆盖，必须延迟一拍 + `positionViewAtIndex()`，并再补一次 ~400ms 的二次定位。
-- **天马元数据缓存 `dataCache.json`**：位于 `/sdcard/pegasus-frontend/dataCache.json`（约 5.79MB）。改完任何 `metadata.pegasus.txt` 必须 `am force-stop` → 删该文件 → 重启，否则界面仍显示旧简介（`force-stop` 单独不够）。重建约 30–40 秒。
-- **自建主题 kpa-shelf 的布局（v4，按 960×640 真实像素）**：顶栏 58px（标题 27px 粗 / 副标题 15px / 右侧当前平台 19px + `n/m` 17px）+ 左栏 238px（平台行高 52px：短名 21px 粗、中文机种名 15px、右侧游戏数 14px；分组标题 30px）+ 中间全宽 722px（GridView 4 列，cell 177×268，封面 167×222）+ 底部信息条 166px（缩略图 96×128 + 标题 25px + 元信息 14px 红 + 简介 15px 固定行高 23 共 3 行 + 右侧键位列）。平台分组顺序固定 家用机→掌机→街机→电脑→移植。三栏并排时右栏会吃掉封面宽度，4 列全宽 + 底部信息条是 960×640 下"封面够大又能看简介"的最优解。简介高度用 `implicitHeight`；行距用 `lineHeightMode: Text.FixedHeight` 才可控（`lineHeight: 1.42` 会被字体度量撑到 ~1.7 倍）。
-- **⚠️ `vpx()` 在本机等于 `v × 0.75`**：Pegasus 自带的 `vpx()` 在这台机器上按 853 高标准换算。用 `vpx(58)` 实际只渲染 43px、`vpx(21)` 的字体只有 15.7px——这就是"字太小、封面太小"的真正根因（不是设计值不够大）。要按真实屏幕像素排版就**直接用原始数值**（本主题封装成 `px(v)` 且 `kScale = 1.0`）。实测校准：顶栏分隔线 57、左栏竖线 237、信息条上边 474，与设计值 58/238/474 一致即证明是 1:1 渲染。
-- **QML 方法名不能大写**：写 `function S(v)` 会报 `Method names cannot begin with an upper case letter`，整个主题直接加载失败（屏幕显示"主题载入失败 /(ToT)/~~"）。缩放函数一律用小写，如 `px()`。
-
-- **`.nomedia`**：Roms / RetroArch / pegasus-frontend / pocketmuseum 四处；隐藏图库素材但不删文件、不影响天马按路径读封面。内部存储 `scan_volume` 立即生效，TF 卡需重启。
-- **PPSSPP（v2.1.7 更正）**：targetSdk 35 无 `MANAGE_EXTERNAL_STORAGE`，读不到 TF 卡 ROM，游戏本体必须在 app 私有 `files/`（拷入后 `chmod 666`）；TF 卡副本只是天马 `file:` 索引，可用 `.app` 占位替代（去重见禁令 38）。⛔ **启动命令禁止 `-d "file://..."`**：Pegasus 会构造 `Intent.setData()`，Android 7+ 抛 `FileUriExposedException`，前端点了没反应。正确写法 `am start --user 0 -n org.ppsspp.ppsspp/.PpssppActivity --es "org.ppsspp.ppsspp.Shortcuts" "<本体绝对路径>"`（`PpssppActivity.parseIntent()` 在无 data 时读该 extra）。验证必须**从天马前端点击**并看 `logcat` 的 `[BOOT] Booted`，⛔ 不能用 `adb shell am start` 代替（shell 不受 App 级 VmPolicy 约束，是假验证）。RetroArch 无 PPSSPP 核心（加载即崩）。退出回天马用 `VIRTKEY_EXIT_APP` + `PauseMenuExitsEmulator` 兜底，配置与实机确认见 §14。启动与退出详见 §13 / §14。
-- **其他**：ATOMOSWAVE 裸 `.bin` 可直接玩（首屏 NOTICE 约 20–30 秒，曾被误判不兼容）；但 `VR运动会.bin`（117MB）实测 40 秒仍全黑、同平台罪恶装备X 20 秒即进画面 —— 判定为坏 ROM，已隔离到 `Roms/_quarantine/` 并移除 metadata 条目（**移走不删，可逆**）；GBA 不要加遮罩（240×160 = 原生满屏 960×640）；封面修复优先 libretro thumbnails，其次实机截图裁 480×320，再不行做标题占位图；中文 zip 条目名会让 toybox `unzip` 误报 CRC BAD 或 `Invalid entry name`，本机 Python `zipfile` 复核为准。

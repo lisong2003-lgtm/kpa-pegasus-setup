@@ -2,93 +2,138 @@
 name: kpa-pegasus-setup
 slug: kpa-pegasus-setup
 displayName: "KPA掌机天马安装与优化助手"
-version: 2.3.2
+version: 2.4.0
 platforms: [macos, linux, windows]
 author: lis
-description: KPA 掌机天马/RA/PPSSPP 安装与排障优化；不含 ROM/BIOS。
+description: KONKR Pocket ADVANCE（KPA，Android 12 / 960×640）掌机的 Pegasus 天马前端 + RetroArch + PPSSPP + EKA2L1（N-Gage）全流程安装、排障与优化。覆盖一键安装编排、metadata 与 dataCache 缓存、竖版方向映射、libretro 核心安装、BIOS/遮罩/着色器、封面与中文简介回填、自建主题 kpa-shelf、双屏布局、全库健康校验与可逆清理、按键修正、N-Gage 1.0/2.0 双环境与天马入口。所有路径、按键码、旋转值均来自该机型实机验证，脚本幂等可重跑。触发词：KPA、KONKR Pocket ADVANCE、天马、Pegasus、RetroArch、PPSSPP、EKA2L1、N-Gage、掌机优化、竖版方向键反了、核心装不上、封面或简介缺失、退出游戏回不到原位、缓存清理、一键安装。
 trigger:
-  - KPA / KONKR Pocket ADVANCE / 天马 / Pegasus / RetroArch
-  - 竖版方向键反了 / 核心装不上 / NDS 双屏变形
-  - 封面不对 / 没有简介 / 缓存清理 / 一键安装
+  - KPA 掌机安装 / 优化
+  - 天马不显示游戏 / 封面不对 / 简介不显示
+  - 竖版游戏方向键反了
+  - RetroArch 核心装不上 / MSX 黑屏
+  - EKA2L1 / N-Gage 装不上 / 天马 NGAGE 没入口
+  - KPA 体检与清理
 locale: zh-CN
 ---
 
 # KPA掌机天马安装与优化助手
 
-面向 **KONKR Pocket ADVANCE**（KPA，AYANEO 旗下，Android 12 / arm64-v8a / 960×640）：把新机或半配置机整理成天马(Pegasus)前端 + RetroArch + PPSSPP 可用状态 —— 平台分组建齐、27 个核心可执行、竖版方向正确、封面与简介完整、每平台热门 10 款置顶、图库不被素材刷屏、可一键重跑。
+面向 **KONKR Pocket ADVANCE**（KPA，AYANEO 旗下，Android 12 / arm64-v8a / 960×640），把新机或半配置机整理成：天马(Pegasus) 前端 **36 平台 3729 游戏**（2026-11-16 设备实测基线，ROM/封面引用缺失 0）、RetroArch 27 个可用核心、PPSSPP 直启、EKA2L1 双 N-Gage 环境、竖版方向正确、封面与简介完整、图库不被素材刷屏、主题与双屏观感可用。
 
-本包是**实机工程沉淀**，路径、按键码、旋转值均来自该机型验证，脚本幂等。ROM / BIOS / APK / 遮罩 PNG 不随包分发：主题二进制在 GitHub `assets-heavy/`，`step2_theme.sh` 缺失时打印指引并跳过，不影响其余步骤。
+本包是**实机工程沉淀**，不是通用模拟器教程。脚本幂等，可重复运行修复。
 
-## 前置条件
+> **不携带版权与大文件**：APK / BIOS / 遮罩 PNG / ROM 均不随包分发。SkillHub / ClawHub 只收文本类文件，因此 **prosperoOS 主题包与背景图放在 GitHub 仓库 `assets-heavy/`**（`step2_theme.sh` 检测到缺失会打印获取指引并跳过，不影响其余步骤）；`assets/golden/` 只放配置文本与 QML 修改。离线完整版可克隆 GitHub 仓库，或用 `scripts/sync_from_device.sh` 从已配置好的机器拉取（仅供个人使用，勿再发布）。
 
-1. `platform-tools`（macOS 实测 r34.0.5），或设 `KPA_ADB=/path/to/adb`。
-2. USB 调试已授权，或 `adb connect <ip>:5555`；`adb devices` 必须显示 `device`。
-3. TF 卡默认 `/storage/6AF3-384F`（不同卡设 `KPA_TF`）；ROM 按 `<TF>/Roms/<平台>/` 组织。
-4. BIOS 自备（清单 `assets/data/bios_list.txt`）：PS / DC / SATURN / PCE-CD / MDCD / MSX / NAOMI 必需，卡带与街机不需要。
+## 必须遵守：硬性禁令
 
-## 一键入口（推荐）
+违反以下任一条都曾导致实机故障。**完整 58 条见 `references/HARD_RULES.md`**（编号连续，按主题分组）。
 
-```bash
-bash scripts/kpa_oneclick.sh --dry-run   # 只读体检 + 计划，设备离线也能预览
-bash scripts/kpa_oneclick.sh             # 体检 → 双回滚点 → 7 步幂等 → 清缓存 → 校验 → report.md
-```
-
-其他模式：`--verify-only`（只出校验报告）、`--steps 3,4`（只跑指定步骤）、`--no-backup`（不建议）。产物在 `~/WorkBuddy/kpa-oneclick/<时间戳>/`：`oneclick.log` / `backup/` / `health.txt` / `report.md`（含「必须人手实机确认」清单）。
-
-只跑 7 步用 `bash scripts/run_all.sh`。专项脚本（竖版修正 / MSX 核心 / ANDROID 收录 / `.nomedia` / 详情页 / 主题增强 / 五类实机修复 / 健康校验 / 简介回填 / 设备同步）清单与用法见 `references/PLAYBOOK.md` §20 与各脚本头注释。
-
-⚠️ 针对特定机器数据的一次性修复 —— 热门 10 款置顶、DOS 同名 `.conf`、GBA 真盒绘回填、土星坏 CHD 删除、CPS1/CPS3 键位、N64 摇杆绑定 —— **不进一键脚本**，按需查 `references/PLAYBOOK.md` §18–§19。
-
-## 硬性禁令（Top 10；全文 57 条见 `references/HARD_RULES.md`）
-
-1. **禁止 `am force-stop com.ayaneo.home`** —— 会杀掉 AYAWindow 的按键服务，KPA/Android 层按键全部失灵，只能关机重启。系统按键不属于 RetroArch。
-2. **禁止把核心 `.so` 推到 public 路径** —— SELinux `avc: denied { execute }`；只认 `/data/data/com.retroarch.aarch64/cores/`。`run-as` / `adb root` / `su` / `adb backup` 在 Android 12 均无效。
-3. **禁止改 metadata / 加目录后不清 `dataCache.json` 就判断生效** —— 必须 force-stop → 删缓存 → 重启天马，否则仍显示旧条目与旧简介。
-4. **禁止靠改 `game_dirs.txt` 排除目录** —— 天马启动会重写回原样；幽灵条目只能删源目录根治。
-5. **禁止整份覆盖 `metadata.pegasus.txt`** —— 只就地 patch launch/字段，云端与设备 ROM 数不匹配会丢游戏。
-6. **禁止未单点确认就批量推广按键/配置改动，也禁止批量「更新已安装核心」** —— 核心源慢、nightly 不稳，与 219 个竖版 cfg / 遮罩 / CRT 有回归风险。用户说「回轮」= 回滚到指定时间点。
-7. **禁止整文件覆盖竖版 cfg** —— 只精确替换 4 行方向，保留 `a/b/start/select/rotation`；禁止新建或污染核心级 `config/remaps/*.rmp`。
-8. **禁止照搬 `video_rotation` 数值差异推导方向** —— MAME `rot=1` 与 FBNEO `rot=3` 最终呈现一致，动手前先查历史。
-9. **禁止用 3.2 秒截图或单一亮度阈值判黑屏/坏封面** —— 冷启动 8–26 秒；先查前台窗口与 `ANR in com.retroarch.aarch64`；封面按图像内容分类，不按尺寸一刀切。
-10. **禁止假设 adb 能操作 RetroArch / 核心菜单** —— RA 直接 poll evdev 设备节点，`input keyevent` / `input tap` 全部无效，`sendevent` 无权限；只有 BACK(4) 能呼出 RA 菜单。核心选项、DOSBox-pure 启动菜单只能人手完成。
+1. **禁止 `am force-stop com.ayaneo.home`** —— 会杀掉 AYAWindow 的 `WindowKeyEventService`，KPA / Android 层系统按键全部失灵，只能关机重启恢复。**系统按键属于 KPA / Android / AYASetting / AYAWindow 层，不是 RetroArch 按键**，不要在 RA 配置里找它。
+2. **禁止把 libretro 核心 `.so` 推到 public 路径**（`/sdcard`、`Android/data`、`/data/local/tmp`）后指望加载 —— SELinux `avc: denied { execute }`；只有 `/data/data/com.retroarch.aarch64/cores/` 可用。`run-as` / `adb root` / `su` / `adb backup` 全部无效（Android 12 备份产出 0 字节）。
+3. **禁止改 metadata / 新增目录后不清 `dataCache.json` 就判断生效** —— 必须 `rm /sdcard/pegasus-frontend/dataCache.json` 再重启天马；缓存会保留已删除游戏。
+4. **禁止靠改 `game_dirs.txt` 排除目录** —— 天马启动会重写回原样；幽灵条目只能删备份目录根治。
+5. **禁止整份覆盖 `metadata.pegasus.txt`** —— 只就地 patch 启动命令/字段，云端与设备 ROM 数不匹配会丢游戏。
+6. **禁止未经单点确认就批量推广按键/配置改动**。用户说「回轮」= 回滚到指定时间点。正确节奏：查历史结论 → 只改一个 → 实机确认 → 再推广。
+7. **禁止对竖版 cfg 整文件覆盖式改按键** —— 只精确替换 4 行方向，保留 a/b/start/select/rotation；禁止新建或污染核心级 `config/remaps/*.rmp`（会作用于该核心全部游戏）。
+8. **禁止照搬 `video_rotation` 数值差异推导方向映射**（MAME `rot=1` 与 FBNEO `rot=3` 最终呈现一致）；动手前先查历史。
+9. **禁止用 3.2 秒截图或单一亮度阈值判黑屏 / 坏封面** —— 冷启动 8–26 秒；先查前台窗口与 `ANR in com.retroarch.aarch64`（ANR 弹窗造成非黑像素假阳性）。
+10. **禁止批量「更新已安装核心」** —— 官方源约 17.5KB/s、nightly 非稳定版，且与 216 个竖版 cfg / 遮罩 / CRT 配套有回归风险；要更新单独点某一个。
+11. **清理前必须先出只读清单 + 影响说明并获确认**；设备删除无废纸篓，分批 ≤10 项、每批校验。
+12. **禁止假设 adb 能操作 RetroArch / 核心菜单** —— `input keyevent`（含 `gamepad` / `keyboard` 源）、`input tap` 对 RA **全部无效**（RA 直接 poll evdev 设备节点），`sendevent` 报 `Permission denied`（shell 不在 input 组）。只有 BACK(4) 能呼出 RA 菜单（走 Activity 回调）。**核心选项、DOSBox-pure 启动菜单的 auto start 这类操作只能由人手完成**，不要反复试注入。
+13. **禁止用 per-playlist cfg 覆盖 `video_font_enable`** —— 必须写进该平台**每个 per-game** cfg（`config/<核心>/<游戏名>.cfg`）；`config/Flycast/ATOMOSWAVE.cfg` 实测不生效。
+14. **禁止在 `Roms/<平台>/` 放非 ROM 文件而不先收紧 `extensions`** —— metadata 无 `extensions` 时 Pegasus 按目录扫全部文件，多一个 `.conf` 就立刻多一个幽灵条目。
+15. **禁止用设备端 `unzip` 改 `.dosz`** —— 含中文条目名会报 `Invalid entry name`；改包一律在本机用 Python `zipfile` 以 append 模式追加（只写新条目，不重压几百 MB）。
 
 ## 按需读取
 
 | 想做什么 | 读哪个 |
 |---|---|
-| 新机一键安装 / 最短路径 / 不走弯路 10 条 | `INSTALL.md` |
-| 关键技术事实速查（按键 / 竖版 / MSX / 主题 / PPSSPP / 缓存） | `references/PLAYBOOK.md` §21 |
-| 分项实操手册（metadata / RA 分层 / 竖版 / 封面 / 详情页 / 清理 / DOS / 按键） | `references/PLAYBOOK.md` |
-| 57 条禁令全文与正确做法 | `references/HARD_RULES.md` |
-| 健康校验 SOP、已知遗留、清理清单与回滚点 | `references/VERIFICATION.md` |
-| 优化全过程复盘 + 机能体检 / 是否发挥到极致 / 分级优化候选 | `references/OPTIMIZATION_JOURNEY.md` |
-| 完整工程复盘（7 阶段、踩坑、三次用户纠正） | `references/PROCESS_REVIEW.md` |
-| 逐版变更、根因与更正 | `CHANGELOG.md` |
-| 直接执行 | `scripts/kpa_oneclick.sh`；只跑 7 步用 `scripts/run_all.sh` |
+| **新机一键安装 / 最短路径 / 不走弯路 10 条** | `INSTALL.md` |
+| **优化全过程复盘 / 机能体检 / 失败与更正清单 / 三次用户纠正溯源** | `references/OPTIMIZATION_JOURNEY.md` |
+| 58 条禁令全文与正确做法 | `references/HARD_RULES.md` |
+| 分项实操手册（metadata / RA 分层 / 竖版 / MSX / 封面 / 详情页 / 街机按键 / DOS / .nomedia） | `references/PLAYBOOK.md` |
+| 健康校验 SOP、达标基线、已知遗留、清理清单 | `references/VERIFICATION.md` |
+| **EKA2L1 / N-Gage 1.0+2.0 / 天马 NGAGE 入口与官方封面** | `references/EKA2L1_NGAGE.md` |
+| 直接执行（推荐） | `scripts/kpa_oneclick.sh`；只跑 7 步用 `scripts/run_all.sh` |
 
-图示属于 `@user_43faedd6` 账号统一的**蓝标（Blueprint Badge）系列**（`assets/blueprints/`），`python3 scripts/blueprint_icons.py` 重新生成、`--check` 校验。
+## 一键安装（推荐入口）
 
-## 健康基线（两个口径，别混用）
+> 新机 / 半配置机统一走这里，完整最短路径见 `INSTALL.md`。
 
-| 口径 | 数字 | 说明 |
+```bash
+bash scripts/kpa_oneclick.sh --dry-run   # 只读体检 + 计划（设备没连也能预览）
+bash scripts/kpa_oneclick.sh             # 体检 → 备份 → 7 步幂等 → 清缓存 → 静态校验 → 报告
+```
+
+编排脚本只跑**通用安装**：`step1~step7` 幂等步骤 + 配置级备份（本机 + 设备双回滚点）+ 自动清 `dataCache.json` + `kpa_health_check.sh` 静态校验 + `report.md`（含「必须人手实机确认」清单）。
+
+⛔ **针对特定机器数据的一次性修复不进一键脚本**：热门 10 款置顶、DOS 同名 `.conf`、`.dosz` 补字节、GBA 真盒绘回填、《光明力量》ZIP 伪装解包、土星坏 CHD 删除、CPS1/CPS3 键位、N64 摇杆绑定 —— 只对那台实机成立，按需查 `references/PLAYBOOK.md` §18–§20。
+
+图示属于 `@user_43faedd6` 账号统一的**蓝标（Blueprint Badge）系列**（`assets/blueprints/`），可用 `python3 scripts/blueprint_icons.py` 重新生成、`--check` 校验。
+
+## 前置条件
+
+1. `platform-tools`（macOS 实测 r34.0.5）解压到 `~/WorkBuddy/*/tools/platform-tools/`，或设 `KPA_ADB=/path/to/adb`。
+2. KPA USB 连接并授权调试，或 `adb connect <ip>:5555`；`adb devices` 必须显示 `device`。
+3. TF 卡默认 `/storage/6AF3-384F`（不同卡设 `KPA_TF`）；ROM / 封面按 `<TF>/Roms/<平台>/` 组织。
+4. BIOS 自备（清单 `assets/data/bios_list.txt`）：PS / DC / SATURN / PCE-CD / MDCD / MSX / NAOMI 必需，卡带与街机平台不需要。
+
+## 执行流程
+
+```bash
+bash scripts/run_all.sh     # step1..step7，幂等，可重跑
+```
+
+| 步骤 | 内容 | 关键判定 |
 |---|---|---|
-| 设备实测（2026-11-15） | **35 平台 / 3706 条** | 删除 VB 与土星《钟表骑士》两作后的实机基线；ROM / 封面引用缺失 0、重复 file 0、无 launch 0、无简介 0 |
-| 资产模板（`kpa_health_check.sh --local`） | **36 平台 / 3773 条** | 包内 `assets/meta_latest/` 仍含 VB 模板；离线自检用这个口径 |
+| step1 | 安装 RetroArch / Pegasus / PPSSPP（官方渠道下载，大 APK 先 push 到 `/data/local/tmp` 再 `pm install -r`） | `pm list packages -3` |
+| step2 | prosperoOS 主题（**master 分支**）+ `assets.logo \|\| assets.boxFront` 回退 + 放大封面 + 背景 | `lastrun.log` 中 `Cannot open` = 0 |
+| step3 | RA 主配置（黑黄 ozone / vulkan / CRT / 96ms / 存档迁 TF）+ 目录 + BIOS 检查 | 单独开 RA 呈黑黄 |
+| step4 | 各平台 metadata 补 launch；按 `mame_orient.json` 生成竖版 cfg | 216 个竖版 cfg，方向统一 |
+| step5 | PPSSPP 满屏 ini + ROM 拷入内置 `files/` + shortcut extra 逐游戏 launch | **前端点击**后 logcat `Booted` |
+| step6 | AppleDouble / `.DS_Store` 清理；可选项**只报告不自动删** | 用户确认后分批 |
+| step7 | 清缓存 → 重启天马 → 截图 + `lastrun.log` 错误检查 | `N games found`、零 ANR |
 
-- 竖版 cfg **219 个**（MAME 2003+ 140 / FBNeo 72 / CPS1 3 / CPS2 2 / NEOGEO 2），方向映射 219/219 正确；早期文档写 216 属口径漂移（少算 3 个 FBNeo 系）。
-- 27/27 libretro 核心可执行、8/8 独立 APP 前台正常、`lastrun.log` 零 error；简介模板句 0 条（3,736 条快照已全有真实简介）。
-- 历史快照 **3769 / 3736 / 3770 / 3773** 是不同时点的数，引用时必须带日期，不当当前值用。
-- 遗留：`WS/恐怖传说.zip` 真坏 ROM；`Roms/_quarantine/VR运动会.bin`（移走不删、可逆）；`savestate_auto_save=true` 会再生 `.state.auto`；街机 CPS1/CPS3、ATOMOSWAVE 竖版、PPSSPP / PS ABXY、N64 方向键的**实体键手感仍需用户实测**（adb 注入对 RA 无效）。
+**专项脚本**（按需单独调用，默认只读 / dry-run）：
+
+| 脚本 | 用途 |
+|---|---|
+| `kpa_vertical.sh` | 把已有竖版 cfg 的 4 行方向修正为实机正确版（`--apply` 才写） |
+| `kpa_msx_core.sh` | MSX blueMSX：搭本地 HTTP 最小核心源，让 RA 自己装进私有目录 |
+| `kpa_android_apps.sh` | ANDROID 移植游戏：`.app` 占位 + per-game launch + 推 metadata |
+| `kpa_nomedia.sh` | 4 个 `.nomedia` + MediaStore 重扫 |
+| `kpa_gamedetails.sh` | 详情页 QML 增强（字号 / 卡片 / 去截断）+ 清缓存 |
+| `kpa_theme_tweak.py` | 主题增强：平台名字号 24→36 并高亮、平台条常显、退出后回原位（`--apply` 才写） |
+| `kpa_gamefix.sh` | 五类实机修复：DOS 存档弹窗 / NDS 双屏变形 / Flycast 雪花 / Atomiswave OSD / 2P 串控 1P（`dos\|nds\|flycast\|aw-osd\|p2\|all`，`--apply` / `--revert`） |
+| `kpa_health_check.sh` | 全库静态校验（ROM / 封面 / launch / 简介 / 竖版 cfg）+ 清理盘点 |
+| `bangumi_desc.py` | 模板式空壳简介升级为真简介并回填 publisher/genre（需 bgm.tv 可达） |
+| `kpa_desc_fill.sh` | 用本地中文简介库批量回填 `description:`，支持 dry-run / `--apply` / 自动 `.bak` |
+| `sync_from_device.sh` | 从已配置好的机型拉回重资产（个人离线用） |
+| `assets/themes/kpa-shelf/` | 自建主题：左栏平台分类 + 中间 4 列封面墙 + 底部整条游戏介绍 |
+
+**体检与清理**：只读扫描命令集、🟢🟡🔴 三色分级、三个「持续产垃圾」开关、ANDROID 卸载五步与分批删除流程见 `references/PLAYBOOK.md` §12；清理硬禁令见 `HARD_RULES.md` 32–35。用户说「检查缓存 / 垃圾」时**只出清单，不在同一轮执行删除**。
+
+**仍需人工**：① RA 首启解包内置核心 ② 自备 BIOS ③ MSX 核心需在 RA 菜单点一次下载 ④ 系统桌面壁纸 ⑤ 详情页观感实机确认 ⑥ **RA / 核心菜单内的任何操作**（adb 注入事件 RA 收不到）。
+
+## 关键技术事实（只列最高频 6 条，其余按需查）
+
+- **EKA2L1 设备只由 `config.yml` 的 `device:` 决定**（intent 的 `appDeviceCode` 完全无效）：**固定 `device: 0` 即可，N-Gage 1.0(QD) 与 2.0(5800) 都正常**。2.0 游戏**无法手工预装**（SISX adler32 bug），只能整体恢复已装好的数据盘；天马入口统一进 Games 平台（直进具体 2.0 游戏 UID 会 native crash）。⛔ 设备端解包 tar 必加 `--no-same-owner`（否则 FUSE `settime: Operation not permitted` 中断）。完整流程见 `references/EKA2L1_NGAGE.md`。
+- **`vpx()` 在本机等于 `v × 0.75`** —— 这是"字太小、封面太小"的真正根因（不是设计值不够大）。按真实像素排版要直接用原始数值（kpa-shelf 封装成 `px(v)`，`kScale = 1.0`）。另：QML 方法名不能大写，`function S(v)` 会让整个主题加载失败。
+- **改 metadata 后必须清 `dataCache.json`**（`/sdcard/pegasus-frontend/dataCache.json`，约 5.79MB）：`am force-stop` → 删文件 → 重启，重建约 30–40 秒。只 `force-stop` 不够。已有 21 条 NGAGE 等条目时**不要清空重扫**（会出现"没有找到游戏"），应用 Python 改 JSON 的 `games` + `path_to_gamefiles`。
+- **Pegasus 每次从游戏返回都会重载主题** —— 位置恢复**只能靠 `api.memory`**（记 `Shelf Game` + `Shelf Collection`），不能指望界面状态残留；且要延迟一拍 + `positionViewAtIndex()` 并补一次 ~400ms 二次定位。
+- **PPSSPP 启动禁止 `-d "file://..."`** —— Pegasus 会构造 `Intent.setData()` 触发 `FileUriExposedException`，前端点了没反应。正确写法 `--es "org.ppsspp.ppsspp.Shortcuts" "<本体绝对路径>"`。验证必须**从天马前端点击**并看 logcat `[BOOT] Booted`，⛔ 不能用 `adb shell am start` 代替（假验证）。
+- **竖版方向最终值**：`up=h0right / down=h0left / left=h0up / right=h0down`，按键 `a=109 / b=108 / start=97 / select=96`；厂商原版基线是反的，**不要照抄**。竖版判定用 `assets/data/mame_orient.json`（6055 条）。街机核心级 cfg 与 CPS3 `.opt` 的按键坑见 `HARD_RULES` 42 / 44、`PLAYBOOK` §15 / §17。
+
+> 其余（metadata 规范、RA 配置分层、MSX 本地镜像、封面修复链路、NDS 双屏、Flycast、DOS、`.nomedia`、kpa-shelf 布局细节）全部在 `references/PLAYBOOK.md`。
 
 ## 清理与回滚
 
 - 设备侧默认零备份；确需保留的最小回滚点（QML 原版、`firmware.bin.bak` 等）在清理清单里单列。
-- 本机工作区产物与报告归档在 GitHub 仓库 `archive/`；本机只保留上架版 skill + adb 工具。
-- 回滚用 `sync_from_device.sh` 从好机器同步，或重跑对应 step。**值级还原优先**：`.bak` 可能是「改完后」才建的副本，覆盖前先比对内容。
-- **任何删除前先出只读清单、说明影响、获确认，分批 ≤10 项逐批校验**；设备删除无废纸篓，`Roms/_quarantine/` 移走不删。
+- 本机工作区产物与报告归档在 GitHub 仓库 `archive/`；本机按「只保留上架版 skill + adb 工具」清理。
+- 回滚用 `sync_from_device.sh` 从好机器同步，或重跑对应 step；**任何删除前先出清单、说明影响、获确认，分批 ≤10 项逐批校验**。
 
 ## 版本与来源
 
-- 当前版本 **2.3.1**；逐版变更、根因与自我更正以 `CHANGELOG.md` 为唯一版本历史来源（本文件不再重复版本流水账）。
-- 发布：SkillHub `@user_43faedd6/kpa-pegasus-setup` · GitHub `lisong2003-lgtm/kpa-pegasus-setup`；ClawHub `kpa-pegasus-setup`（入口可用性以当次回查为准）。
+- 当前 **v2.4.0**（2026-11-16）：新增 EKA2L1 / N-Gage 1.0 + 2.0 双环境、天马 NGAGE 21 入口与官方封面。逐版变更（含 v1.0.0 起全部记录）见 **`CHANGELOG.md`**。
+- 发布：SkillHub `@user_43faedd6/kpa-pegasus-setup` · ClawHub `kpa-pegasus-setup` · GitHub `lisong2003-lgtm/kpa-pegasus-setup`
 - 资源版权归各自所有者；本包只分发配置文本、脚本与自建主题修改，不含 ROM / BIOS / APK。

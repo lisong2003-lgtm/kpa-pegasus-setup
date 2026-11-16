@@ -1,6 +1,14 @@
-# 硬性禁令（57 条）
+# 硬性禁令（58 条）
 
-每一条都来自实机故障或用户纠正。`SKILL.md` 只保留 Top 10 速查，本文是全文与正确做法（第 1～57 条，编号连续）。第 36～40 条为 2026-11-14 清理与 PSP 排障新增，其中 37/38 已按 17:35 回归更正；第 41 条为 18:55 追加（PPSSPP 退出与注入按键陷阱），已于 21:50 用户实体键实测闭环并更正两条错误推测（见该条状态行 / v2.1.9）；第 42 条为 22:25 追加、22:35 更正（街机核心级 cfg 按键污染）；第 43 条为 22:35 追加（playlist 混合编码与死引用判定）；第 44 条为 22:50 追加（CPS3 六键布局由核心选项 `.opt` 决定，⛔ 别套用第 42 条的 cfg 修法）；第 45～50 条为 11-15 第一批 13 项反馈新增，第 51～55 条为第二轮反馈新增（含 48 条自我更正），第 56～57 条为 v2.3.0 沉淀新增（一次性修复不进通用安装、SkillHub 二进制限制与蓝标规范）。
+每一条都来自实机故障或用户纠正。`SKILL.md` 收录前 15 条，本文是全文与正确做法。**编号 1–58 连续无缺**，按主题分组（A 系统层 / B 天马 / C RetroArch / D PSP 与判定 / E 清理与纪律 / F 输入注入），分组只是归类，编号是唯一引用口径。
+
+- 36–40：2026-11-14 清理与 PSP 排障新增，其中 37/38 已按 17:35 回归更正。
+- 41：PPSSPP 退出与注入按键陷阱，21:50 用户实体键实测闭环。
+- 42–44：街机核心级 cfg 按键污染（42）、playlist 混合编码与死引用（43）、CPS3 六键由 `.opt` 决定（44，⛔ 别套用 42 的 cfg 修法）。
+- 45–52：DOS 免选 exe、`.dosz` 崩溃二分、PICO 遮罩、GBA 封面按内容分类、土星 CHD 引导区、扩展名不可信、N64 十字键绑左摇杆、汉化版长片头。
+- 53–56：删大文件先留回滚点、删条目同步清封面与历史引用、静态 0 缺失≠封面修好、一次性修复不进通用脚本。
+- 57：SkillHub 发布包拒绝 `.png`，图示走 COS + 绝对 URL。
+- 58：EKA2L1 设备只由 `config.yml device:` 决定（v2.4.0）。
 
 ## A. 系统层与权限
 
@@ -93,8 +101,8 @@
 ## F. RA 输入注入与配置层级（v2.0.1 新增）
 
 **23. 禁止假设 adb 能操作 RetroArch / 核心菜单**
-- ❌ 反复试 `input keyevent 19/20/21/22`、`input gamepad|joystick|dpad|keyboard keyevent`、`input tap`、`input motionevent` 去点 RA 菜单或 DOSBox-pure 启动菜单 —— **RA 完全不接收**。它直接 poll evdev 设备节点，绕过 InputManager，注入的事件根本不进它的输入队列（实测四种 source 注入后截图逐像素完全相同）。
-- ❌ `sendevent <evdev 设备节点> ...` → `Permission denied`（shell 不在 `input` 组；`getevent` 同样读不到，无输出）。
+- ❌ 反复试 `input keyevent 19/20/21/22`、`input gamepad|joystick|dpad|keyboard keyevent`、`input tap`、`input motionevent` 去点 RA 菜单或 DOSBox-pure 启动菜单 —— **RA 完全不接收**。它直接 poll `/dev/input 下的 event* 节点`，绕过 InputManager，注入的事件根本不进它的输入队列（实测四种 source 注入后截图逐像素完全相同）。
+- ❌ `sendevent /dev/input 下的 event3 节点 ...` → `Permission denied`（shell 不在 `input` 组；`getevent` 同样读不到，无输出）。
 - ✅ 唯一有效的是 `input keyevent 4`(BACK)，走 Activity 回调能呼出 RA 菜单。
 - ✅ **天马(Pegasus) 是普通 Qt 应用、走 InputManager**，`input tap` / `input motionevent DOWN x y` + 0.3s + `UP x y` 对它有效。别把天马和 RA 的输入路径混为一谈 —— 这是本条最容易被误推的地方。
 - ✅ 结论：RA 核心选项、DOSBox-pure 启动菜单（`→ Set Auto Start`）这类操作**只能人手完成**。脚本负责把"该改哪个文件、改成什么值"准备好，但不要承诺自动点菜单。
@@ -158,8 +166,8 @@ grep -E '^input_player1_(a|b|start|select|up)_btn' "config/MAME 2003-Plus/arkano
 
 **33. `.state.auto` 是存档不是缓存；会话 jsonl / sqlite 是正文不是日志**
 - `RetroArch/states/*.state.auto`（`savestate_auto_save=true` 每次退出写）代表游戏进度，最大一份 67.5M。要清必须逐份点名，⛔ 不要 `rm states/*.state*`。
-- 本机 `$CODEX_HOME/sessions/**/*.jsonl` 是 Codex 对话的 **source of truth**；`~/.workbuddy/projects/**/*.jsonl` 是桌面端本地会话正文（`transport=local` 不上云）；`thread_history_1.sqlite` 虽可从 rollout 重建，但必须先备份 + 完全退出 App。⛔ 都不能当「缓存」清掉。
-- `~/.workbuddy/logs/sandbox|traces|20XX-XX-XX/` 与 `$CODEX_HOME/logs_2.sqlite` 才是可按日期/保留窗口处理的日志。
+- 本机 `$HOME/.codex/sessions/**/*.jsonl` 是 Codex 对话的 **source of truth**；`$HOME/.workbuddy/projects/**/*.jsonl` 是桌面端本地会话正文（`transport=local` 不上云）；`thread_history_1.sqlite` 虽可从 rollout 重建，但必须先备份 + 完全退出 App。⛔ 都不能当「缓存」清掉。
+- `$HOME/.workbuddy/logs/sandbox|traces|20XX-XX-XX/` 与 `$HOME/.codex/logs_2.sqlite` 才是可按日期/保留窗口处理的日志。
 
 **34. 卸载 ANDROID 移植游戏必须走五步，只 `pm uninstall` 会留下点不开的死条目**
 - 顺序：① 备份（原 APK 拉本地 + 设备 `metadata.pegasus.txt` / 占位 `.app` / `dataCache.json` 拷 `/sdcard/backup/<game>/`）→ ② `pm uninstall` 并 `pm list packages` 复核 → ③ **就地**删 metadata 的 5 行条目（⛔ 不整份覆盖）并把 `.app` 移走 → ④ `rm dataCache.json` + 重启天马 + 等 12 秒确认缓存重建 → ⑤ 同步本地镜像 `work/meta/ANDROID/metadata.pegasus.txt` 并核对 `grep -c '^game:'`。
@@ -315,7 +323,12 @@ grep -E '^input_player1_(a|b|start|select|up)_btn' "config/MAME 2003-Plus/arkano
 
 **57. ⚠️ SkillHub 发布包拒绝所有 `.png`；图示必须先传 COS，文档用绝对 URL 引用**
 - **实测（v2.3.0）**：`skillhub publish` 带 `icon.png` 直接返回 `400 不允许的文件类型: icon.png`——服务端按扩展名拒绝二进制文件，原 skill 文档「SkillHub / ClawHub 只允许文本类文件」属实。⛔ 别再把 png 放进发布目录，也别去试 `/skills/<slug>/icon`、`PATCH /skills/<slug>`（全部 405）。
-- ✅ 正确链路：① `POST /api/v1/skills/<slug>/comments/images?namespace=@<handle>/<slug>`，multipart 字段名 `file`，返回 `{"url":"https://skillhub-*.cos.../skill-comments/uploads/<uid>/<hash>.png"}`，公开可读且持久；② 把 README / INSTALL 里的相对图片路径替换为该绝对 URL，并在包内留一份 `assets/blueprints/URLS.md` 清单；③ 主图标 `iconUrl` 在 `POST /api/v1/community/skills/publish` 的 **payload JSON** 里带（CLI 的 `_post_publish_multipart` 没实现这个字段，需手工构造 multipart）；④ 发布后必须回查 `GET /api/v1/skills/<slug>` 的 `skill.iconUrl`，若为 `None` 说明服务端忽略了该字段，需在网页端补设（把 COS URL 交给用户）。
+- ✅ 正确链路：① `POST /api/v1/skills/<slug>/comments/images?namespace=@<handle>/<slug>`，multipart 字段名 `file`，返回 `{"url":"https://skillhub-*.cos.../skill-comments/uploads/<uid>/<hash>.png"}`，公开可读且持久；② 把 README / INSTALL 里的相对图片路径替换为该绝对 URL，并在包内留一份 `assets/blueprints/URLS.md` 清单；③ 主图标 `iconUrl` 在 `POST /api/v1/community/skills/publish` 的 **payload JSON** 里带（CLI 的 `_post_publish_multipart` 没实现这个字段，需手工构造 multipart）；④ 发布后必须回查 `GET /api/v1/skills/<slug>` 的 `skill.iconUrl`，若为 `None` 先别急着判定失败：**实测 2.3.0 发布返回 `201` 且 `contentAuditStatus=pending`**，此时用户列表 `version` 已变 2.3.0、`stats.versions` +1，但详情 `latestVersion` 仍停在旧版、`/versions` 只列已审版本、`iconUrl` 仍 `None` —— 属内容/图标审核队列，需等审核通过再回查；审核后仍为 `None` 才说明服务端忽略该字段，需在网页端补设（把 COS URL 交给用户）。
 - `files` 多 part 用相对路径作 filename，`.md` 用 `text/markdown`，其余 `application/octet-stream`；发布包只保留文本类文件（`.md/.txt/.sh/.py/.json/.ini/.cfg/.opt/.orig/.qml/.verified`）。
 - 同账号 15 个 skill 的 `icon.png` 与线上 `iconUrl` 像素 diff=0.00。蓝标系列规范：512×512（或 256×256）、深藏青 `#0A1F3C` 网格蓝图底（32px 细网格 / 128px 主网格）、亮青蓝 `#49D0FF` 圆角外框与线稿、白色辅助线、无渐变无阴影、**主图标无文字**；1 个主体 + 1 个角标，大留白。
 - 发布后必须回查 `GET https://api.skillhub.cn/api/v1/skills/<slug>` 的 `skill.iconUrl`、`latestVersion.version` 与 `latestVersion.changelog`，不要只看 publish 返回的 success。本机图示生成器 `scripts/blueprint_icons.py --check` 可校验产物；从发布包安装后若需本地图，重跑该生成器即可。
+
+**58. ⚠️ EKA2L1 设备只由 `config.yml device:` 决定，intent 的 `appDeviceCode` 完全无效**
+- 实测：设 `device:1`(5800) 时，即使 intent 带 `--es appDeviceCode RH-29`，FIFA 1.0 仍黑屏；日志 `Device being used:` 显示实际设备。设 `device:0`(QD) 后 1.0 与 2.0 全部正常。⛔ 别再靠改 intent 的 appDeviceCode 切设备，也别为 1.0/2.0 做动态 config 切换 —— **固定 `device: 0` 即可**。
+- 2.0 游戏无法手工预装：官方 EKA2L1 0.1.0 SIS 安装器 adler32 bug，手工写注册链全部失败；只能整体恢复已装好的数据盘 tar。intent 直进具体 2.0 游戏 UID 会 native crash，天马入口统一进 Games 平台。详见 `EKA2L1_NGAGE.md`。
+- FUSE 私有目录解包 tar 必加 `tar -xf ... --no-same-owner`，否则 `settime: Operation not permitted` 中断；`ls | wc -l` 枚举会少算，封面覆盖用逐个 `[ -s ]` 校验。

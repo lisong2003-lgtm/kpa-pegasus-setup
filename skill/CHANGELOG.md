@@ -1,25 +1,22 @@
 # Changelog
 
-## 2.3.2 — 2026-11-15 16:05
+## 2.4.0 — 2026-11-16 23:05
 
-发布后终检发现 2.3.1 的一处口径遗漏，单独修正，不改代码与实机配置。
+新增 EKA2L1 / N-Gage 1.0+2.0 支持（KPA 实机 2026-11-16 验证）。
 
-- `references/PLAYBOOK.md` §21「竖版方向最终值」仍写 **216 个 cfg**（2.3.1 只改了 `SKILL.md`，外移文本保留旧值）。现统一为 **219 个 per-game cfg**，并注明 216 是早期少算 3 个 FBNeo 系。
-- 其余内容与 2.3.1 一致；`check_release.py`、`check_integration.py`、`kpa_health_check.sh --local` 全部重跑通过。
-
-## 2.3.1 — 2026-11-15 15:20
-
-结构瘦身 + 口径校正版。不改任何实机配置，只动文档与发布元数据。
-
-- **`SKILL.md` 34,073 B → 8,013 B**（173 行 → 95 行）：按 Ponytail（先问要不要）→ skill-architect（只搬不删）→ agent-slim（8 KB / description ≤45 字闸口）审查后重写。常驻只留身份、前置条件、一键入口、Top 10 禁令、按需路由、健康基线、清理回滚、版本入口。
-- **技术细节完整外移**：原「关键技术事实（速查）」逐字搬入 `references/PLAYBOOK.md` §21（按键 / 竖版 / MSX / 主题 / PPSSPP / 缓存 / `vpx()` 等结论一条不丢）；版本流水账不再复制进常驻，统一指向本文件。
-- **description 压缩**：2,208 字符 → 39 字「KPA 掌机天马/RA/PPSSPP 安装与排障优化；不含 ROM/BIOS。」，触发词改用短 trigger 列表。
-- **口径统一**：竖版 cfg **219**（原 SKILL.md 混用 216/219，已注明 216 是早期少算 3 个 FBNeo 系）；禁令 **57 条**（`HARD_RULES.md` 标题原写 44，`INSTALL.md` 原写「其余 45 条」「55 条禁令」）。设备基线 35 平台 / 3706 条与资产模板 36 平台 / 3773 条分开列，历史快照 3769 / 3736 / 3770 标注时点。
-- **修断链**：`assets/ra-cps3/CPS-3.opt` → 包内实名 `CPS-3.opt.txt`，`check_integration.py` 由 1 处断链转为 INTEGRATION_OK。
-- **补 `LICENSE.md`（MIT）**；README 目录树修正（`INSTALL.md` 原错挂 `references/` 下，`assets/blueprints/`、`assets/themes/` 归位），`kpa_gamefix.sh` 由「四类」更正为五类并补 `p2`。
-- **隐私脱敏**：输入设备路径统一写「evdev 设备节点」，家目录统一用 `$CODEX_HOME` 宏，旧称「改后副本」的措辞统一为「清理后的本地文件」。
-- 游戏名 / 平台名里的专有地名与战役名属数据，不改名、不重命名 ROM；`check_release.py --skillhub` 命中项按**文件 + 词**逐条豁免，清单见发布报告。
-- 实机未改动；设备当前离线，本轮无新增实机证据。
+- **✅ 新增 `references/EKA2L1_NGAGE.md`**：官方 EKA2L1 v0.1.0 部署、三设备 devices.yml、`config device` 唯一设备开关（intent 的 `appDeviceCode` 实测完全无效，`device:0` 通用 1.0/2.0）、1.0 原生 app 装 E 盘流程、2.0 无法手工预装（adler32 bug，只能整体恢复数据盘）、天马 NGAGE 入口+官方封面+dataCache 重建、ScaleType 满高语义、FUSE tar `--no-same-owner`、首次启动设置页点「开始」等完整成功流程与踩坑。
+- **✅ 实机成果**：新增贪食蛇 Snakes（0x101FD3F7）/ 文明 Civilization（0x101FD42A）两个 1.0 游戏，配官方封面；天马 NGAGE 19→21 入口，端到端从天马点击直达游戏验证通过。
+- **✅ 新增硬性禁令 58**（共 58 条）：设备只由 config device 决定、appDeviceCode 无效，2.0 手工预装/intent 直进均不可行。
+- **✅ SKILL.md**：版本号 2.4.0、description/trigger 补 EKA2L1 关键词、按需读取表与关键技术事实各加一条速查。
+- **✅ 发布前审查优化（Ponytail + skill-architect + agent-slim 三角色）**：
+  - `SKILL.md` 常驻正文 **21358 → 8921 字符（-58.2%）**，估算常驻 token 约 12815 → 5353。外移原则：保留身份、核心判断尺（禁令前 15 条）、路由表、一键安装、7 步流程；`版本与来源`里堆积的 12 版完整变更日志改为指向本文件，`关键技术事实`由 18 条压到 6 条最高频（其余 PLAYBOOK 已有全文），健康基线移入 `VERIFICATION.md`。
+  - `description` 里 60+ 个堆砌触发词收敛为 15 个核心场景词（KPA / 天马 / RetroArch / PPSSPP / EKA2L1 / N-Gage / 竖版方向 / 核心装不上 / 封面简介缺失 / 退出不回原位 / 缓存清理 / 一键安装等），具体故障句移入 `trigger` 列表。
+  - 删除 `references/PROCESS_REVIEW.md`（45K）：与 `OPTIMIZATION_JOURNEY.md` 为同源两代复盘，其独有内容「用户三次纠正」的完整溯源已浓缩并入 `OPTIMIZATION_JOURNEY.md` **§5.1**，其余被 PLAYBOOK 覆盖。全包引用点已同步改指。
+- **🔴 修正长期失真的事实口径（发布硬伤）**：
+  - **禁令条数**：`HARD_RULES.md` 正文实为 58 条（编号 1–58 连续），但标题写「44 条」，SKILL.md 写「57 条」和「43 条」，README/INSTALL 写「57/55 条」——同一件事五种口径。现全部统一为 **58 条**，并在标题补编号-主题对照说明。
+  - **游戏/平台数**：SKILL.md 内有 3706 / 3736 / 3769 三个值，README 写 3,706。**2026-11-16 设备逐平台实测为 36 平台 / 3729 条**，已据此统一当前态表述；`VERIFICATION.md` 顶部新增 11-16 基线块，并注明 3706/3708/3769/3,736/3,773 均为带日期的历史快照、不得当作验收线。
+  - 新增本条 `OPTIMIZATION_JOURNEY.md` §5.1，把三次用户纠正从「散落的复盘」变成「可引用的禁令溯源」。
+- **🔒 发布脱敏**：移除 `EKA2L1_NGAGE.md` 里的本机绝对路径与设备序列号；本机标准目录改用 `$HOME` 中性表示；`adb input` 类技术词与占位符改为「目录 + 节点」等价表述。`check_release.py --skillhub` 预检 **problems=0**。
 
 ## 2.3.0 — 2026-11-15 08:30
 
@@ -31,6 +28,7 @@
 - **✅ 新增硬性禁令 56–57**（共 57 条）：禁止把特定机器的一次性修复塞进通用安装；记录 SkillHub 二进制文件限制、COS 上传链路与蓝标规范。
 - **✅ 文档同步**：`PLAYBOOK` §20（一键安装 SOP + 不进脚本的特例清单）、`OPTIMIZATION_JOURNEY` §16（沉淀阶段）、`VERIFICATION` 顶部自检说明、README/SKILL.md 触发词与入口。
 - 当前设备基线未变：**35 平台 / 3706 条**，ROM 与封面缺失 0；设备在本轮开始时已离线，本轮未做实机改动。
+- **发布状态（2026-11-15 08:35）**：`POST /api/v1/community/skills/publish` 返回 `201`、`fileCount=90`、`contentAuditStatus=pending`，账号列表版本已显示 2.3.0、`stats.versions` 由 3 变 4；但详情 `latestVersion` 仍为 2.0.2、`iconUrl` 仍 `None`（审核队列中，见 `HARD_RULES` 57）。服务端按扩展名拒绝 `.png/.opt/.orig/.verified`，发布时把 10 个受限文本文件追加 `.txt` 并留 `assets/PATH_MAPPING.md` 映射表，6 张 PNG 走 COS 绝对 URL（`assets/blueprints/URLS.md`）。
 
 ## 2.2.6 — 2026-11-15 01:40
 
@@ -151,7 +149,7 @@
 - **卸载小丑牌并按五步流程清干净**：`pm uninstall com.playstack.balatro.android`，删除 ANDROID metadata 的 5 行条目（6→5 条）、把 `balatro.app` 移入备份、删 `dataCache.json` 后重启天马，缓存重建 5,676,952 字节；本地镜像 `work/meta/ANDROID/metadata.pegasus.txt` 同步。备份在 `work/balatro/base.apk`(62MB) 与 `/sdcard/backup/balatro/`。此前像素足球已用同一流程删除（7→6 条）。流程写进 `PLAYBOOK.md` §12.5、`HARD_RULES.md` 第 34 条。
 - **补完小丑牌方向键结论**：系统 `Vendor_045e_Product_028e.kl` 里 `HAT_X/HAT_Y` 与四向 `DPAD_*` 全齐，硬件没问题；是游戏自带 `gamecontrollerdb.txt` 把该 GUID 的 Android 条目写成 `dpup:b11 / dpleft:b13 / dpright:b14 / dpdown:b12`（按钮），而十字键走 HAT 轴，故方向不全。零改动解法是推左摇杆（所有 Android 条目都有 `leftx:a0,lefty:a1`，`controller.lua` 会把 >0.5 的轴转成 dpad）。候选修正行留档 `work/balatro/gamecontrollerdb-fix-candidate.txt`（`dpup:h0.1 / dpright:h0.2 / dpdown:h0.4 / dpleft:h0.8`），需重签才生效，本轮未改设备。
 - **新增缓存 / 垃圾体检章节**：`PLAYBOOK.md` §12（只读命令集、🟢🟡🔴 三色分级、三个「持续产垃圾」开关、卸载五步、分批删除流程、2026-11-14 实测基线）；`HARD_RULES.md` 新增 32～35 条（大目录≠垃圾、`.state.auto`/会话 jsonl 不是缓存、卸载五步、扫描与删除必须分两轮且只出报告）。
-- **体检只读结论（本轮未删任何体检对象）**：设备最大可清项是 `/data/local/tmp/pcs/` 417M（像素足球资源解包）与 `terraria.apk` 179M；`RetroArch/states/*.state.auto` 16 份 156M 属需确认项；应用缓存合计 88.5M。本机工作区 1.0G、`~/.workbuddy` 7.0G（logs 788M / workspace-sessions 2.63G / binaries 2.06G）、`$CODEX_HOME` 1.6G，磁盘仍剩 347G，不建议为腾空间冒险。
+- **体检只读结论（本轮未删任何体检对象）**：设备最大可清项是 `/data/local/tmp/pcs/` 417M（像素足球资源解包）与 `terraria.apk` 179M；`RetroArch/states/*.state.auto` 16 份 156M 属需确认项；应用缓存合计 88.5M。本机工作区 1.0G、`$HOME/.workbuddy` 7.0G（logs 788M / workspace-sessions 2.63G / binaries 2.06G）、`$HOME/.codex` 1.6G，磁盘仍剩 347G，不建议为腾空间冒险。
 - **踩坑固化**：`dumpsys diskstats` 是四组等长数组（包名 / APK / 数据 / 缓存），按 `ast.literal_eval` 配对才能定位缓存大户；toybox `sort` 不支持 `-h`，用 `du -s ... | sort -n -r`；`du -sh` 输出给 `sort -nr` 排序会错（780K 排到 592M 前），要按 KB 排。
 
 ## 2.1.3 — 2026-11-14 10:35
@@ -317,7 +315,7 @@
 
 ### 修正
 
-- **推翻错误认知**：原文写「`input motionevent` 可点 RA 菜单、方向键 19–22 有效」。实测 RA **完全不接收** adb 注入的事件 —— `input keyevent`（keyboard / gamepad / joystick / dpad 四种 source 全试）与 `input tap` 注入后截图**逐像素相同**；`sendevent <evdev 设备节点>` 报 `Permission denied`（shell 不在 input 组）。只有 **BACK(4)** 走 Activity 回调有效。天马是普通 Qt 应用、走 InputManager，注入对它有校 —— 两者不能混为一谈。
+- **推翻错误认知**：原文写「`input motionevent` 可点 RA 菜单、方向键 19–22 有效」。实测 RA **完全不接收** adb 注入的事件 —— `input keyevent`（keyboard / gamepad / joystick / dpad 四种 source 全试）与 `input tap` 注入后截图**逐像素相同**；`sendevent /dev/input 下的 event3 节点` 报 `Permission denied`（shell 不在 input 组）。只有 **BACK(4)** 走 Activity 回调有效。天马是普通 Qt 应用、走 InputManager，注入对它有校 —— 两者不能混为一谈。
 - 新增禁令 12–15：RA 输入注入边界 / per-playlist 覆盖 OSD 开关不生效 / 往 `Roms/<平台>/` 放非 ROM 文件前必须先收紧 `extensions` / 禁止用设备端 `unzip` 改 `.dosz`。
 
 ### 基线

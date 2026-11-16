@@ -2,7 +2,7 @@
 
 面向 **KONKR Pocket ADVANCE**（KPA，AYANEO 旗下，Android 12 / arm64-v8a / 960×640）的 Pegasus 天马前端 + RetroArch + PPSSPP 全流程安装、排障与优化 Skill。
 
-整套方案来自一次真实机器的完整搭建工程：当前 **35 平台 3,706 条**（2026-11-15 删除 VB 后基线，ROM/封面引用缺失均为 0）、27 个可用 libretro 核心、8 个独立 APP、219 个竖版游戏方向映射、每平台热门 10 款置顶（332 条 `sort-by`），全部有实机截图或静态复核留痕。仓库里既有**一键安装编排脚本**与可重复执行的幂等脚本，也有踩坑复盘、**57 条硬性禁令**和统一的蓝标系列图示；v2.3.0 新增「一键安装不走弯路」通道（`INSTALL.md` + `kpa_oneclick.sh`）与蓝标图示；v2.3.2 修正 `PLAYBOOK.md` §21 遗留的「216 个竖版 cfg」旧口径（统一为 219）；v2.3.1 做结构瘦身（`SKILL.md` 34KB→8KB，技术细节外移到 `PLAYBOOK.md` §21，补 `LICENSE.md`，修正断链与口径）；v2.2.6 更正「按尺寸判 GBA 占位封面」的误判并回填 191 张真实盒绘、修 N64 十字键绑定、定性 PS 汉化版长片头、删除土星坏 CHD；v2.2.5 新增 DOS 免选 exe 直启、`.dosz` 载入崩溃二分定位、MSX/PICO 遮罩与土星 CHD 引导区判定的完整 SOP（`references/PLAYBOOK.md` §18）。
+整套方案来自一次真实机器的完整搭建工程：当前 **36 平台 3,729 条**（2026-11-16 实测基线，ROM/封面引用缺失均为 0）、27 个可用 libretro 核心、8 个独立 APP、219 个竖版游戏方向映射、每平台热门 10 款置顶，全部有实机截图或静态复核留痕。仓库里既有**一键安装编排脚本**与可重复执行的幂等脚本，也有踩坑复盘、**58 条硬性禁令**和统一的蓝标系列图示。逐版变更见 `CHANGELOG.md`，当前版本 **v2.4.0**（新增 EKA2L1 / N-Gage 1.0+2.0 双环境与天马 NGAGE 入口）。
 
 ⚠️ 验收边界：按键类改动只做到「配置落地 + 冷启动冒烟」，实体键手感需用户在掌机上实测；《钟表骑士》/《钟表骑士 2》CHD 无有效土星引导区，属镜像数据问题，需替换或删条目。
 
@@ -57,20 +57,19 @@ bash scripts/kpa_health_check.sh              # 也可单独做只读全库静�
 ## 目录
 
 ```
-SKILL.md                    主入口：身份、前置条件、一键入口、Top 10 禁令、路由、基线
+SKILL.md                    主入口：身份、前置条件、一键入口、Top 15 禁令、路由、基线、关键技术事实
 INSTALL.md                  一键安装最短路径 / 不走弯路 10 条 / 六阶段流程总结
 CHANGELOG.md                逐版变更、根因与自我更正（唯一版本历史来源）
 LICENSE.md                  MIT
 references/
-  PLAYBOOK.md               分项实操手册 + §21 关键技术事实速查
-  HARD_RULES.md             57 条硬性禁令与正确做法
-  VERIFICATION.md           健康校验 SOP、遗留项、清理清单、回滚点
-  OPTIMIZATION_JOURNEY.md   四天优化全过程、量化成果、机能体检与分级优化候选
-  PROCESS_REVIEW.md         完整工程复盘（7 阶段、踩坑、三次用户纠正）
+  PLAYBOOK.md               分项实操手册（metadata / RA 分层 / 竖版 / MSX / 封面 / 按键 / DOS）
+  HARD_RULES.md             58 条硬性禁令与正确做法
+  VERIFICATION.md           健康校验 SOP、达标基线、遗留项、清理清单、回滚点
+  OPTIMIZATION_JOURNEY.md   优化全过程、量化成果、机能体检、失败与更正清单、三次用户纠正溯源
 scripts/                    幂等安装脚本 + 专项工具
 assets/golden/              配置文本、QML 增强版与原版（无二进制）
 assets/data/                平台→核心映射、竖版方向库、BIOS 清单
-assets/meta_latest/         36 平台 metadata 模板（含 VB；实机基线 35 平台）
+assets/meta_latest/         36 平台 metadata 模板（实机基线 36 平台 / 3729 条）
 assets/ra-cps3/             CPS3 六键布局定稿 `.opt`（arcade）与原版回滚点
 assets/ppsspp/              PPSSPP 退出组合键定稿、实机生效基准与原版
 assets/themes/kpa-shelf/    自建主题 QML / theme.cfg 文本版

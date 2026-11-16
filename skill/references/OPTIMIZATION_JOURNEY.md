@@ -131,6 +131,30 @@ launch: am start --user 0 -n org.ppsspp.ppsspp/.PpssppActivity --es "org.ppsspp.
 | 「PSP 改 `file:` 占位就够了」 | 去重 | 还需改 `launch`、清缓存、从前端验证、删副本后再验证 |
 | 「删 D2/D3/D4 的 ROM 与 metadata 就完事」 | 去重 | RA playlist 还有 4 条死引用，必须三处同步 |
 
+### 5.1 三次用户纠正的完整溯源（2026-11-12 夜，本节为原 `PROCESS_REVIEW.md` §3.2–3.4 的浓缩留档）
+
+这三次是整轮工程最贵的教训，均来自"把不可信反馈当成事实证据反复叠加修改"。
+
+**纠正 ① 系统按键属于 KPA / Android / AYASetting / AYAWindow 层，不是 RetroArch**
+
+- 用户原话：21:23「系统按键还原，现在的系统按键都被改了」→ 22:02「是 KPA 的系统，安卓系统下，或者进入一些程序后不能像之前那样了」→ 22:27「你找出系统按键更改的时间和原因，先回轮，不要去改」→ 22:39「我关机重启了机器，系统按键都回来了」。
+- 溯源（核对原始 JSONL，非凭印象）：全历史唯一 `settings put` 是 `stay_on_while_plugged_in 7`，**从未写过** navigation_mode / keylayout / 按键映射。真正的动作是 12:14:32 为了刷新壁纸执行 `am force-stop com.ayaneo.home`。
+- 根因：强杀 `com.ayaneo.home` 连带杀掉它承载的 AYAWindow `WindowKeyEventService`（无障碍按键服务），自定义键与进 App 后的按键解释全部失效（22:03 实测 `Crashed services={WindowKeyEventService}`、`Bound={}`）。**是运行时状态丢失，不是键位配置被改**（配置目录 mtime 仍是 11-10）。
+- 机型按键澄清：厂商自定义键 `key 751 LC / 752 RC / 753 EQ / 754 AYA` 靠 WindowKeyEventService 解释；**无实体摇杆、无 L3/R3**（此前把 106/107 列入按键表是照搬 Xbox 键值，错的）。
+- 落成禁令 1。
+
+**纠正 ② 竖版批量改错后的「回轮到 23:03、只改一个、确认后再推广」**
+
+- 时间线：23:03 注入 `keyevent 96/97` 进游戏成功，证明回滚后的 cfg 已被 RA 正确加载 → 23:06 只翻 `airattck` → 23:08 顺手把另外 68 个一起翻 → 23:09 用户「回轮到 23:03 分」→ 用 `argus.cfg.vendor` 把 69 个全部还原 → 23:13 用户「只需要改方向键……这次只改一个」→ 只改 `airattck`，校验 68 厂商原版 + 1 翻转版 → 23:15「为什么都改错了，刚开始是改对了的」→ 23:20「对的，这次都对，现在推广」。
+- 三个根因：① 12:14 强杀 `com.ayaneo.home` 后，21:23–21:53 的实机反馈都在系统按键服务失效状态下产生，却被当成配置证据反复叠加；② 21:14 新建的核心级 `FinalBurn Neo.rmp` 多出 4 行 `btn_a/b/x/y`，污染**全部** FBNEO 游戏（"实体 START 变游戏 Y"的真元凶），而当时只在单文件打补丁；③ 从"只改 4 行"退化成"整文件覆盖"，回滚时把对的方向一起撤掉。
+- 教训：**先确认基线可信，再谈修改**；局部问题只做局部替换；未经单点确认不批量推广。落成禁令 6、7。
+
+**纠正 ③ MAME `rot=1` 与 FBNEO `rot=3` 呈现一致，不要照搬差异**
+
+- 用户原话（引用助手自己的话后纠正）：「这个问题之前就处理过了，你先查看」。
+- 事实：FBNeo/fbalpha 核心自带自动旋转，`rot=3` 与 MAME 2003-Plus 的 `rot=1` **最终呈现一致**（文字顶部朝右、满屏横躺），所以方向映射可以一起翻。airattck / dogyuun / 1941 / batsugun / gekiridn 均实测确认。后续按各自原版精确替换 4 行，全机 216 个竖版统一，23:42「1941 测试正常」全部验证通过。
+- 教训：动数值前先查历史结论；「数值不同 → 行为不同」是常见的多余推导。落成禁令 8。
+
 ---
 
 ## 6. 关键性能配置现状（只读采集）
@@ -227,10 +251,10 @@ launch: am start --user 0 -n org.ppsspp.ppsspp/.PpssppActivity --es "org.ppsspp.
 | 内容 | 文件 |
 |---|---|
 | 版本逐条记录 | `CHANGELOG.md`（1.0.0 → 2.2.4） |
-| 44 条禁令全文 | `references/HARD_RULES.md` |
+| 58 条禁令全文 | `references/HARD_RULES.md` |
 | 分项实操 SOP（17 节） | `references/PLAYBOOK.md`（§12 缓存 / §13 PSP 启动 / §14 退出 / §15 街机核心级 cfg / §16 playlist / §17 CPS3 六键） |
 | CPS3 / PPSSPP 定稿配置 | `assets/ra-cps3/`、`assets/ppsspp/` |
-| 早期 7 阶段工程复盘 | `references/PROCESS_REVIEW.md` |
+| 用户三次纠正的完整溯源 | 本文件 §5.1（原 `PROCESS_REVIEW.md` 已合并至此） |
 | 健康校验 SOP / 回滚点 | `references/VERIFICATION.md` |
 | PPSSPP 定稿 / 实机 / 原版配置 | `assets/ppsspp/`（`*.verified` 为实机生效基准） |
 
